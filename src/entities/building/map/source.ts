@@ -1,7 +1,7 @@
 import type maplibregl from 'maplibre-gl'
 
 export const BUILDINGS_SOURCE_ID = 'buildings-geojson'
-export const BUILDINGS_GEOJSON_URL = '/geojsons/build.geojson'
+export const BUILDINGS_GEOJSON_URL = `${import.meta.env.BASE_URL}geojsons/build.geojson`
 
 export const EMPTY_BUILDINGS_SOURCE: maplibregl.GeoJSONSourceSpecification = {
   type: 'geojson',

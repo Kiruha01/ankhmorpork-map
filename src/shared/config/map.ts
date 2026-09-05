@@ -197,12 +197,12 @@ export function createOverlayTheme(patch: OverlayThemePatch = {}): OverlayTheme 
 export const BASE_MAP_VARIANTS: Record<BaseMapVariantId, { tilesUrl: string; previewUrl: string; overlayTheme: OverlayTheme }> = {
   orig: {
     tilesUrl: 'https://tiles.klisov.ru/orig/{z}/{x}/{y}.jpg',
-    previewUrl: '/assets/images/map_orig.jpg',
+    previewUrl: `${import.meta.env.BASE_URL}assets/images/map_orig.jpg`,
     overlayTheme: createOverlayTheme(),
   },
   rus: {
     tilesUrl: 'https://tiles.klisov.ru/rus/{z}/{x}/{y}.jpg',
-    previewUrl: '/assets/images/map_rus.jpg',
+    previewUrl: `${import.meta.env.BASE_URL}assets/images/map_rus.jpg`,
     overlayTheme: createOverlayTheme(),
   },
 }

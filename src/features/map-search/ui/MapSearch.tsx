@@ -19,7 +19,7 @@ type MapSearchProps = {
 }
 
 const VISIBLE_RESULTS_LIMIT = 8
-const SEARCH_ICON_URL = '/assets/icons/search.svg'
+const SEARCH_ICON_URL = `${import.meta.env.BASE_URL}assets/icons/search.svg`
 export type SearchIntent = 'results' | 'direct-detail'
 
 export function MapSearch({ map, getSearchFeatures, language, onSearchResults, onSearchReset, onClearReady, onHighlightsReady }: MapSearchProps) {

@@ -8,6 +8,10 @@ npm run dev
 
 Сборка для production: `npm run build`.
 
+## Деплой в GitHub Pages
+
+Workflow [deploy-pages.yml](.github/workflows/deploy-pages.yml) запускается при каждом push в `master` и вручную из вкладки **Actions**. Он публикует собранное приложение по пути репозитория, поэтому его нужно включить один раз в настройках репозитория: **Settings → Pages → Build and deployment → Source → GitHub Actions**.
+
 ## Устройство
 
 Структура и правила её развития описаны в [AGENTS.md](AGENTS.md). MapLibre создаётся в `widgets/map`, доменные источники и стили лежат в `entities`, а React-интерфейс вокруг карты — в `features`.
