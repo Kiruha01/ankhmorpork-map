@@ -1,44 +1,36 @@
 import type maplibregl from 'maplibre-gl'
-import { registerBeerLayer } from '../../../entities/beer/map/registerBeerLayer'
-import { applyBeerTheme } from '../../../entities/beer/map/layers'
-import { BEERS_GEOJSON_URL, BEERS_SOURCE_ID } from '../../../entities/beer/map/source'
-import { registerBuildingsLayer } from '../../../entities/building/map/registerBuildingsLayer'
-import { applyBuildingTheme } from '../../../entities/building/map/layers'
-import { BUILDINGS_GEOJSON_URL, BUILDINGS_SOURCE_ID } from '../../../entities/building/map/source'
 import { switchBaseMapVariant } from '../../../entities/base-map/map/registerBaseMapLayer'
-import { registerStreetsLayer } from '../../../entities/street/map/registerStreetsLayer'
-import { applyStreetTheme } from '../../../entities/street/map/layers'
-import { STREETS_GEOJSON_URL, STREETS_SOURCE_ID } from '../../../entities/street/map/source'
+import { MAP_OBJECT_DOMAINS } from '../../../entities/map-object/map/domains'
+import type { MapObjectDomain } from '../../../entities/map-object/map/types'
 import { BASE_MAP_VARIANTS, type BaseMapVariantId, type OverlayTheme } from '../../../shared/config/map'
 import { LocalizedGeoJsonDataset } from '../../../shared/lib/geojson/localizedSource'
+import type { MapObjectFeature } from '../../../shared/lib/geojson/types'
 import type { SupportedLanguage } from '../../../shared/config/i18n'
 
-type ObjectDomain = {
-  sourceId: string
+type LoadedObjectDomain = MapObjectDomain & {
   dataset: LocalizedGeoJsonDataset
-  register: (map: maplibregl.Map, theme: OverlayTheme) => void
+}
+
+export type SearchMapObjectFeature = {
+  sourceId: string
+  id: string | number
+  feature: MapObjectFeature
+}
+
+export type MapObjectFeaturesProvider = () => Promise<SearchMapObjectFeature[]>
+
+function getFeatureId(feature: MapObjectFeature): string | number | null {
+  const fid = feature.properties?.fid
+  return typeof fid === 'string' || typeof fid === 'number' ? fid : null
 }
 
 /** Coordinates the one MapLibre instance with domain-owned sources and layers. */
 export class MapObjectLayersController {
   private readonly abortController = new AbortController()
-  private readonly domains: ObjectDomain[] = [
-    {
-      sourceId: BUILDINGS_SOURCE_ID,
-      dataset: new LocalizedGeoJsonDataset(BUILDINGS_GEOJSON_URL),
-      register: registerBuildingsLayer,
-    },
-    {
-      sourceId: STREETS_SOURCE_ID,
-      dataset: new LocalizedGeoJsonDataset(STREETS_GEOJSON_URL),
-      register: registerStreetsLayer,
-    },
-    {
-      sourceId: BEERS_SOURCE_ID,
-      dataset: new LocalizedGeoJsonDataset(BEERS_GEOJSON_URL),
-      register: registerBeerLayer,
-    },
-  ]
+  private readonly domains: LoadedObjectDomain[] = MAP_OBJECT_DOMAINS.map((domain) => ({
+    ...domain,
+    dataset: new LocalizedGeoJsonDataset(domain.geoJsonUrl),
+  }))
   private destroyed = false
 
   constructor(
@@ -72,13 +64,24 @@ export class MapObjectLayersController {
     this.abortController.abort()
   }
 
+  /** Returns domain-owned raw feature references, independent of map viewport and zoom. */
+  async getSearchFeatures(): Promise<SearchMapObjectFeature[]> {
+    const collections = await Promise.all(this.domains.map(async ({ sourceId, dataset }) => ({
+      sourceId,
+      data: await dataset.load(this.abortController.signal),
+    })))
+
+    return collections.flatMap(({ sourceId, data }) => data.features.flatMap((feature) => {
+      const id = getFeatureId(feature)
+      return id === null ? [] : [{ sourceId, id, feature }]
+    }))
+  }
+
   private applyBaseMapVariant(): void {
     const theme = BASE_MAP_VARIANTS[this.baseMapVariant].overlayTheme
     switchBaseMapVariant(this.map, this.baseMapVariant)
     this.applyThemeImages(theme)
-    applyBuildingTheme(this.map, theme)
-    applyStreetTheme(this.map, theme)
-    applyBeerTheme(this.map, theme)
+    this.domains.forEach(({ applyTheme }) => applyTheme(this.map, theme))
   }
 
   private applyThemeImages(theme: OverlayTheme): void {

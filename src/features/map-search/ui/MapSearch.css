@@ -1,0 +1,114 @@
+.map-search {
+  position: absolute;
+  z-index: 1;
+  top: 1.25rem;
+  left: 1.25rem;
+  width: min(20rem, calc(100vw - 2.5rem));
+}
+
+.map-search__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.map-search__field {
+  position: relative;
+}
+
+.map-search__input {
+  width: 100%;
+  padding: .7rem 5.5rem .7rem .8rem;
+  border: 0;
+  border-radius: .5rem;
+  color: #172033;
+  background: #fff;
+  box-shadow: 0 4px 12px rgb(26 42 66 / 16%);
+  font: inherit;
+}
+
+.map-search__input:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.map-search__submit,
+.map-search__reset {
+  position: absolute;
+  top: 50%;
+  right: .25rem;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: .375rem;
+  color: #334155;
+  background: transparent;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.map-search__submit img {
+  width: 1.125rem;
+  height: 1.125rem;
+}
+
+.map-search__reset {
+  right: 2.75rem;
+  font: inherit;
+  font-size: 1.375rem;
+  line-height: 1;
+}
+
+.map-search__submit:hover,
+.map-search__reset:hover {
+  background: #f1f5f9;
+}
+
+.map-search__submit:focus-visible,
+.map-search__reset:focus-visible,
+.map-search__result:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.map-search__results {
+  display: grid;
+  gap: .125rem;
+  max-height: min(24rem, calc(100vh - 7rem));
+  margin-top: .5rem;
+  padding: .375rem;
+  list-style: none;
+  overflow-y: auto;
+  border-radius: .5rem;
+  background: rgb(255 255 255 / 96%);
+  box-shadow: 0 4px 12px rgb(26 42 66 / 16%);
+}
+
+.map-search__result,
+.map-search__empty {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: .5rem .625rem;
+  border: 0;
+  color: #334155;
+  background: transparent;
+  font-size: .875rem;
+  text-align: left;
+}
+
+.map-search__result {
+  border-radius: .25rem;
+  cursor: pointer;
+}
+
+.map-search__result:hover,
+.map-search__result:focus-visible {
+  background: #f1f5f9;
+}

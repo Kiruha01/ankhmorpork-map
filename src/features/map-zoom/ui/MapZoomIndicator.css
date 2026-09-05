@@ -1,8 +1,8 @@
 .map-zoom-indicator {
   position: absolute;
   z-index: 1;
-  top: 1.25rem;
-  left: 1.25rem;
+  top: 4rem;
+  right: 4.5rem;
   padding: .5rem .75rem;
   border-radius: .5rem;
   color: #172033;

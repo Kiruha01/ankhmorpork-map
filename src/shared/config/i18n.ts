@@ -2,7 +2,11 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
 type TranslationResource = {
-  items?: Record<string, { title?: unknown }>
+  items?: Record<string, {
+    title?: unknown
+    description?: unknown
+    aliases?: unknown
+  }>
   interface?: {
     language?: {
       name?: string
@@ -17,6 +21,13 @@ type LanguageResource = {
 }
 
 export type SupportedLanguage = string
+
+export type SearchableTranslationItem = {
+  id: string
+  title: string
+  description: string
+  aliases: string[]
+}
 
 export const LANGUAGE_STORAGE_KEY = 'map-language'
 
@@ -65,6 +76,26 @@ export function getItemTitle(language: SupportedLanguage, nameId: string): strin
   if (typeof selectedTitle === 'string' && selectedTitle.trim()) return selectedTitle
   if (typeof englishTitle === 'string' && englishTitle.trim()) return englishTitle
   return null
+}
+
+/**
+ * Returns only entries from the active locale file. Search intentionally does
+ * not fall back to English: its index must reflect the currently selected
+ * translation file.
+ */
+export function getSearchableTranslationItems(language: SupportedLanguage): SearchableTranslationItem[] {
+  const translation = languageResources.find(({ code }) => code === language)?.translation
+
+  return Object.entries(translation?.items ?? []).flatMap(([id, item]) => {
+    if (typeof item.title !== 'string' || !item.title.trim()) return []
+
+    return [{
+      id,
+      title: item.title,
+      description: typeof item.description === 'string' ? item.description : '',
+      aliases: Array.isArray(item.aliases) ? item.aliases.filter((alias): alias is string => typeof alias === 'string') : [],
+    }]
+  })
 }
 
 export { i18n }

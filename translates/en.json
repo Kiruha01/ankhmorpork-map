@@ -175,6 +175,15 @@
     "pointer": {
       "position": "Screen: {{x}}, {{y}} · Coordinates: {{lng}}, {{lat}}"
     },
+    "search": {
+      "label": "Search map objects",
+      "placeholder": "Search places",
+      "submit": "Search",
+      "reset": "Clear search",
+      "resultsLabel": "Search results",
+      "empty": "No results",
+      "loading": "Map objects are loading"
+    },
     "language": {
       "menuLabel": "Interface language selection",
       "name": "English",

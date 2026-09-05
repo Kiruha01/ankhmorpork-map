@@ -6,16 +6,17 @@ import { registerBaseMapLayer } from '../../../entities/base-map/map/registerBas
 import type { BaseMapVariantId } from '../../../shared/config/map'
 import type { SupportedLanguage } from '../../../shared/config/i18n'
 import { MAP_OPTIONS } from '../../../shared/config/map'
-import { MapObjectLayersController } from '../model/MapObjectLayersController'
+import { MapObjectLayersController, type MapObjectFeaturesProvider } from '../model/MapObjectLayersController'
 import './MapCanvas.css'
 
 type MapCanvasProps = {
   onMapReady: (map: maplibregl.Map | null) => void
+  onSearchFeaturesReady: (provider: MapObjectFeaturesProvider | null) => void
   language: SupportedLanguage
   baseMapVariant: BaseMapVariantId
 }
 
-export function MapCanvas({ onMapReady, language, baseMapVariant }: MapCanvasProps) {
+export function MapCanvas({ onMapReady, onSearchFeaturesReady, language, baseMapVariant }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const objectLayersControllerRef = useRef<MapObjectLayersController | null>(null)
   const languageRef = useRef(language)
@@ -36,6 +37,7 @@ export function MapCanvas({ onMapReady, language, baseMapVariant }: MapCanvasPro
       const controller = new MapObjectLayersController(map, languageRef.current, baseMapVariantRef.current)
       controller.initialize()
       objectLayersControllerRef.current = controller
+      onSearchFeaturesReady(() => controller.getSearchFeatures())
       onMapReady(map)
     }
     map.once('load', onLoad)
@@ -44,10 +46,11 @@ export function MapCanvas({ onMapReady, language, baseMapVariant }: MapCanvasPro
       map.off('load', onLoad)
       objectLayersControllerRef.current?.destroy()
       objectLayersControllerRef.current = null
+      onSearchFeaturesReady(null)
       onMapReady(null)
       map.remove()
     }
-  }, [onMapReady])
+  }, [onMapReady, onSearchFeaturesReady])
 
   useEffect(() => {
     objectLayersControllerRef.current?.setLanguage(language)
