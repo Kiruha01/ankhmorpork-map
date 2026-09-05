@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import {
   BASE_MAP_VARIANTS,
   type BaseMapVariantId,
-  switchBaseMapVariant,
 } from '../../../entities/base-map/map/registerBaseMapLayer'
 import mapOriginalPreview from '../../../shared/assets/images/map_orig.jpg'
 import mapRussianPreview from '../../../shared/assets/images/map_rus.jpg'
@@ -30,7 +29,6 @@ export function MapBasemapSwitcher({ map, selectedVariant, onVariantChange }: Ma
   const selectVariant = (variant: BaseMapVariantId) => {
     if (!map || variant === selectedVariant) return
 
-    switchBaseMapVariant(map, variant)
     onVariantChange(variant)
   }
 

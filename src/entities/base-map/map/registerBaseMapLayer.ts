@@ -1,17 +1,9 @@
 import type maplibregl from 'maplibre-gl'
+import { BASE_MAP_VARIANTS, type BaseMapVariantId } from '../../../shared/config/map'
 
 const SOURCE_ID = 'base-raster-source'
 
-export type BaseMapVariantId = 'orig' | 'rus'
-
-export const BASE_MAP_VARIANTS: Record<BaseMapVariantId, { tilesUrl: string }> = {
-  orig: {
-    tilesUrl: 'https://tiles.klisov.ru/orig/{z}/{x}/{y}.jpg',
-  },
-  rus: {
-    tilesUrl: 'https://tiles.klisov.ru/rus/{z}/{x}/{y}.jpg',
-  },
-}
+export { BASE_MAP_VARIANTS, type BaseMapVariantId }
 
 const source = {
   type: 'raster' as const,

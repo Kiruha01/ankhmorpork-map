@@ -2,6 +2,7 @@ import i18n from 'i18next'
 import { initReactI18next } from 'react-i18next'
 
 type TranslationResource = {
+  items?: Record<string, { title?: unknown }>
   interface?: {
     language?: {
       name?: string
@@ -52,6 +53,18 @@ void i18n.use(initReactI18next).init({
 export async function changeLanguage(language: SupportedLanguage): Promise<void> {
   await i18n.changeLanguage(language)
   window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
+}
+
+/** Returns a public object title without ever exposing a technical `name_id`. */
+export function getItemTitle(language: SupportedLanguage, nameId: string): string | null {
+  const selectedTranslation = languageResources.find(({ code }) => code === language)?.translation
+  const englishTranslation = languageResources.find(({ code }) => code === 'en')?.translation
+  const selectedTitle = selectedTranslation?.items?.[nameId]?.title
+  const englishTitle = englishTranslation?.items?.[nameId]?.title
+
+  if (typeof selectedTitle === 'string' && selectedTitle.trim()) return selectedTitle
+  if (typeof englishTitle === 'string' && englishTitle.trim()) return englishTitle
+  return null
 }
 
 export { i18n }

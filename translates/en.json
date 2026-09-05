@@ -10,7 +10,9 @@
       "title": "Short street",
       "description": "",
       "fandom_wiki": "",
-      "aliases": ["small"]
+      "aliases": [
+        "small"
+      ]
     },
     "street_attic_bee": {
       "title": "Attic bee street",
@@ -28,19 +30,132 @@
       "title": "Post office",
       "description": "",
       "fandom_wiki": "",
-      "aliases": ["mail"]
+      "aliases": [
+        "mail"
+      ]
     },
     "build_opera": {
       "title": "Openra house",
       "description": "",
       "fandom_wiki": "",
-      "aliases": ["sing", "song"]
+      "aliases": [
+        "sing",
+        "song"
+      ]
     },
     "house_citywatch": {
       "title": "City watch",
       "description": "",
       "fandom_wiki": "",
       "aliases": []
+    },
+    "street_artificers": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_merchan": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_ettercap": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_kicklebury": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_alice": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_dodney": {
+      "title": "street_dodney",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_bernicks": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_coper": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_caulk": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_caulk_yard": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_seckless": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_foundlink": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_bankrupt": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_bookkepers": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_threelamp": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_passet": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_1": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_audit": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
     }
   },
   "interface": {
