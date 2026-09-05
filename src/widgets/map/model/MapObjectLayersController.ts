@@ -18,6 +18,7 @@ export type SearchMapObjectFeature = {
 }
 
 export type MapObjectFeaturesProvider = () => Promise<SearchMapObjectFeature[]>
+export type MapObjectFeatureAtPointProvider = (point: maplibregl.PointLike) => Promise<SearchMapObjectFeature | null>
 
 function getFeatureId(feature: MapObjectFeature): string | number | null {
   const fid = feature.properties?.fid
@@ -75,6 +76,43 @@ export class MapObjectLayersController {
       const id = getFeatureId(feature)
       return id === null ? [] : [{ sourceId, id, feature }]
     }))
+  }
+
+  /**
+   * Uses rendered features only to identify the object under the pointer. The
+   * returned feature always comes from the complete raw domain dataset.
+   */
+  async getFeatureAtPoint(point: maplibregl.PointLike): Promise<SearchMapObjectFeature | null> {
+    if (this.destroyed) return null
+
+    let renderedFeatures: maplibregl.MapGeoJSONFeature[]
+    try {
+      renderedFeatures = this.map.queryRenderedFeatures(point, {
+        layers: this.domains.flatMap(({ interactiveLayerIds }) => interactiveLayerIds),
+      })
+    } catch (error: unknown) {
+      if (!this.destroyed) console.error('Unable to inspect map object at pointer', error)
+      return null
+    }
+
+    const identities = renderedFeatures.flatMap((feature) => {
+      const id = feature.id
+      return feature.source && (typeof id === 'string' || typeof id === 'number')
+        ? [{ sourceId: feature.source, id }]
+        : []
+    })
+    if (identities.length === 0) return null
+
+    try {
+      const rawFeatures = await this.getSearchFeatures()
+      if (this.destroyed) return null
+      return identities
+        .map(({ sourceId, id }) => rawFeatures.find((feature) => feature.sourceId === sourceId && feature.id === id))
+        .find((feature): feature is SearchMapObjectFeature => Boolean(feature)) ?? null
+    } catch (error: unknown) {
+      if (!this.destroyed) console.error('Unable to load map object for inspection', error)
+      return null
+    }
   }
 
   private applyBaseMapVariant(): void {

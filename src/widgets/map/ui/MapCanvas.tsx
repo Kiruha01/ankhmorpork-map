@@ -6,17 +6,22 @@ import { registerBaseMapLayer } from '../../../entities/base-map/map/registerBas
 import type { BaseMapVariantId } from '../../../shared/config/map'
 import type { SupportedLanguage } from '../../../shared/config/i18n'
 import { MAP_OPTIONS } from '../../../shared/config/map'
-import { MapObjectLayersController, type MapObjectFeaturesProvider } from '../model/MapObjectLayersController'
+import {
+  MapObjectLayersController,
+  type MapObjectFeatureAtPointProvider,
+  type MapObjectFeaturesProvider,
+} from '../model/MapObjectLayersController'
 import './MapCanvas.css'
 
 type MapCanvasProps = {
   onMapReady: (map: maplibregl.Map | null) => void
   onSearchFeaturesReady: (provider: MapObjectFeaturesProvider | null) => void
+  onObjectFeatureAtPointReady: (provider: MapObjectFeatureAtPointProvider | null) => void
   language: SupportedLanguage
   baseMapVariant: BaseMapVariantId
 }
 
-export function MapCanvas({ onMapReady, onSearchFeaturesReady, language, baseMapVariant }: MapCanvasProps) {
+export function MapCanvas({ onMapReady, onSearchFeaturesReady, onObjectFeatureAtPointReady, language, baseMapVariant }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const objectLayersControllerRef = useRef<MapObjectLayersController | null>(null)
   const languageRef = useRef(language)
@@ -38,6 +43,7 @@ export function MapCanvas({ onMapReady, onSearchFeaturesReady, language, baseMap
       controller.initialize()
       objectLayersControllerRef.current = controller
       onSearchFeaturesReady(() => controller.getSearchFeatures())
+      onObjectFeatureAtPointReady((point) => controller.getFeatureAtPoint(point))
       onMapReady(map)
     }
     map.once('load', onLoad)
@@ -47,10 +53,11 @@ export function MapCanvas({ onMapReady, onSearchFeaturesReady, language, baseMap
       objectLayersControllerRef.current?.destroy()
       objectLayersControllerRef.current = null
       onSearchFeaturesReady(null)
+      onObjectFeatureAtPointReady(null)
       onMapReady(null)
       map.remove()
     }
-  }, [onMapReady, onSearchFeaturesReady])
+  }, [onMapReady, onObjectFeatureAtPointReady, onSearchFeaturesReady])
 
   useEffect(() => {
     objectLayersControllerRef.current?.setLanguage(language)

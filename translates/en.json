@@ -188,6 +188,18 @@
       "menuLabel": "Interface language selection",
       "name": "English",
       "flag": "🇬🇧"
+    },
+    "inspector": {
+      "resultsAriaLabel": "Found map objects",
+      "detailsAriaLabel": "Map object details",
+      "resultsTitle": "Found objects",
+      "close": "Close object panel",
+      "back": "Back to results",
+      "fandomLink": "Fandom Link",
+      "geoJsonAttributes": "GeoJSON attributes",
+      "sourceId": "Source ID",
+      "featureId": "Feature ID",
+      "untitled": "Untitled"
     }
   }
 }

@@ -2,13 +2,13 @@
   "items": {
     "street_small_god": {
       "title": "Улица малых богов",
-      "description": "",
+      "description": "Улица названа в честь всяких богов, которые могут встретиться где-угодно. Это самая безобидная улица",
       "fandom_wiki": "",
       "aliases": []
     },
     "street_short": {
       "title": "Короткая улица",
-      "description": "",
+      "description": "Самая короткая улица в городе, хотя некоторые так не считают",
       "fandom_wiki": "",
       "aliases": ["small"]
     },
@@ -17,6 +17,12 @@
       "description": "",
       "fandom_wiki": "",
       "aliases": []
+    },
+    "street_artificers": {
+      "title": "Улица искусных умельцев",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
     },
     "build_assassins": {
       "title": "Гильдия убийц",
@@ -38,9 +44,9 @@
     },
     "house_citywatch": {
       "title": "Городская стража",
-      "description": "",
-      "fandom_wiki": "",
-      "aliases": []
+      "description": "Поскольку Дракон сжёг полицейский участок на улице Паточной Шахты, леди Овнец подарила Ночной Страже новое здание, принадлежавшее семье Овнец — Псевдополис-Ярд. ",
+      "fandom_wiki": "https://discworld.fandom.com/ru/wiki/%D0%93%D0%BE%D1%80%D0%BE%D0%B4%D1%81%D0%BA%D0%B0%D1%8F_%D1%81%D1%82%D1%80%D0%B0%D0%B6%D0%B0",
+      "aliases": ["Ваймс", "штаб квартира"]
     }
   },
   "interface": {
@@ -73,6 +79,18 @@
       "menuLabel": "Выбор языка интерфейса",
       "name": "Русский",
       "flag": "🇷🇺"
+    },
+    "inspector": {
+      "resultsAriaLabel": "Найденные объекты карты",
+      "detailsAriaLabel": "Сведения об объекте карты",
+      "resultsTitle": "Найденные объекты",
+      "close": "Закрыть панель объекта",
+      "back": "Вернуться к результатам",
+      "fandomLink": "Ссылка на Fandom",
+      "geoJsonAttributes": "Атрибуты GeoJSON",
+      "sourceId": "ID источника",
+      "featureId": "ID объекта",
+      "untitled": "Без названия"
     }
   }
 }

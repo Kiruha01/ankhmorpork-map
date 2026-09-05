@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import maplibregl from 'maplibre-gl'
 import { useTranslation } from 'react-i18next'
 import { MAP_OBJECT_DOMAINS } from '../../../entities/map-object/map/domains'
 import type { SupportedLanguage } from '../../../shared/config/i18n'
-import type { MapObjectFeaturesProvider } from '../../../widgets/map/model/MapObjectLayersController'
+import type { MapObjectFeaturesProvider, SearchMapObjectFeature } from '../../../widgets/map/model/MapObjectLayersController'
 import { extendGeometryBounds } from '../model/geometryBounds'
 import { createSearchIndex, searchItems, type SearchResult } from '../model/searchIndex'
 import searchIcon from '../../../shared/assets/icons/search.svg'
@@ -13,50 +13,65 @@ type MapSearchProps = {
   map: maplibregl.Map | null
   getSearchFeatures: MapObjectFeaturesProvider | null
   language: SupportedLanguage
-}
-
-type FeatureReference = {
-  source: string
-  id: string | number
+  onSearchResults: (objects: SearchMapObjectFeature[], bounds: maplibregl.LngLatBounds, intent: SearchIntent) => void
+  onSearchReset: () => void
+  onClearReady: (clear: (() => void) | null) => void
+  onHighlightsReady: (apply: ((objects: readonly SearchMapObjectFeature[]) => void) | null) => void
 }
 
 const VISIBLE_RESULTS_LIMIT = 8
+export type SearchIntent = 'results' | 'direct-detail'
 
-export function MapSearch({ map, getSearchFeatures, language }: MapSearchProps) {
+export function MapSearch({ map, getSearchFeatures, language, onSearchResults, onSearchReset, onClearReady, onHighlightsReady }: MapSearchProps) {
   const { t } = useTranslation()
   const [query, setQuery] = useState('')
   const searchRunRef = useRef(0)
   const index = useMemo(() => createSearchIndex(language), [language])
   const results = useMemo(() => searchItems(index, query), [index, query])
 
-  const clearHighlights = () => {
+  const applyHighlights = useCallback((objects: readonly SearchMapObjectFeature[]) => {
     if (!map) return
-    MAP_OBJECT_DOMAINS.forEach(({ applySearchResults }) => applySearchResults(map, []))
-  }
+    MAP_OBJECT_DOMAINS.forEach(({ sourceId, applySearchResults }) => {
+      applySearchResults(map, objects.filter((object) => object.sourceId === sourceId).map(({ id }) => id))
+    })
+  }, [map])
 
-  const resetSearch = () => {
+  const clearHighlights = useCallback(() => applyHighlights([]), [applyHighlights])
+
+  const resetSearch = useCallback(() => {
     searchRunRef.current += 1
     setQuery('')
     clearHighlights()
-  }
+    onSearchReset()
+  }, [clearHighlights, onSearchReset])
 
   useEffect(() => () => clearHighlights(), [map])
 
   useEffect(() => {
+    onClearReady(resetSearch)
+    return () => onClearReady(null)
+  }, [onClearReady, resetSearch])
+
+  useEffect(() => {
+    onHighlightsReady(applyHighlights)
+    return () => onHighlightsReady(null)
+  }, [applyHighlights, onHighlightsReady])
+
+  useEffect(() => {
     searchRunRef.current += 1
     clearHighlights()
+    onSearchReset()
   // A search index is locale-specific, so an old selection must not persist after a locale switch.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [language])
+  }, [clearHighlights, language, onSearchReset])
 
-  const runSearch = async (matchedResults: SearchResult[]) => {
+  const runSearch = async (matchedResults: SearchResult[], intent: SearchIntent) => {
     const searchRun = ++searchRunRef.current
     if (!map || !getSearchFeatures) return
 
     clearHighlights()
     const matchedIds = new Set(matchedResults.map(({ id }) => id))
     const bounds = new maplibregl.LngLatBounds()
-    const featureReferences = new Map<string, FeatureReference>()
+    const featureReferences = new Map<string, SearchMapObjectFeature>()
 
     try {
       const features = await getSearchFeatures()
@@ -65,8 +80,7 @@ export function MapSearch({ map, getSearchFeatures, language }: MapSearchProps) 
       features.forEach(({ sourceId, id, feature }) => {
         if (!matchedIds.has(String(feature.properties?.name_id))) return
 
-        const reference = { source: sourceId, id }
-        featureReferences.set(`${sourceId}:${id}`, reference)
+        featureReferences.set(`${sourceId}:${id}`, { sourceId, id, feature })
         extendGeometryBounds(bounds, feature.geometry)
       })
     } catch (error: unknown) {
@@ -76,24 +90,16 @@ export function MapSearch({ map, getSearchFeatures, language }: MapSearchProps) 
     }
 
     const selectedFeatures = [...featureReferences.values()]
-    MAP_OBJECT_DOMAINS.forEach(({ sourceId, applySearchResults }) => {
-      applySearchResults(map, selectedFeatures.filter((feature) => feature.source === sourceId).map(({ id }) => id))
-    })
+    applyHighlights(selectedFeatures)
 
-    if (selectedFeatures.length === 0 || bounds.isEmpty()) return
-
-    const southWest = bounds.getSouthWest()
-    const northEast = bounds.getNorthEast()
-    if (southWest.lng === northEast.lng && southWest.lat === northEast.lat) {
-      map.flyTo({ center: southWest, zoom: Math.max(map.getZoom(), 18.5), duration: 600 })
+    if (selectedFeatures.length === 0 || bounds.isEmpty()) {
+      // Keep the entered query, but tell the parent that this search session no
+      // longer has objects. This prevents a previous inspector session from
+      // remaining visible after an empty search.
+      onSearchResults([], bounds, intent)
       return
     }
-
-    map.fitBounds(bounds, {
-      padding: { top: 80, right: 80, bottom: 80, left: 360 },
-      maxZoom: 18.5,
-      duration: 600,
-    })
+    onSearchResults(selectedFeatures, bounds, intent)
   }
 
   return (
@@ -102,7 +108,7 @@ export function MapSearch({ map, getSearchFeatures, language }: MapSearchProps) 
       role="search"
       onSubmit={(event) => {
         event.preventDefault()
-        void runSearch(results)
+        void runSearch(results, 'results')
       }}
     >
       <label className="map-search__label" htmlFor="map-search-input">{t('interface.search.label')}</label>
@@ -141,7 +147,7 @@ export function MapSearch({ map, getSearchFeatures, language }: MapSearchProps) 
                 className="map-search__result"
                 onClick={() => {
                   setQuery(result.title)
-                  void runSearch([result])
+                  void runSearch([result], 'direct-detail')
                 }}
               >
                 {result.title}

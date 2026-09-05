@@ -8,5 +8,6 @@ export type MapObjectDomain = {
   register: (map: maplibregl.Map, theme: OverlayTheme) => void
   applyTheme: (map: maplibregl.Map, theme: OverlayTheme) => void
   applySearchResults: (map: maplibregl.Map, featureIds: readonly (string | number)[]) => void
+  /** Visual geometry layers that may be selected by a primary map click. */
+  interactiveLayerIds: readonly string[]
 }
-

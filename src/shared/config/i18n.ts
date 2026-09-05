@@ -5,12 +5,16 @@ type TranslationResource = {
   items?: Record<string, {
     title?: unknown
     description?: unknown
+    fandom_wiki?: unknown
     aliases?: unknown
   }>
   interface?: {
     language?: {
       name?: string
       flag?: string
+    }
+    inspector?: {
+      untitled?: string
     }
   }
 }
@@ -27,6 +31,12 @@ export type SearchableTranslationItem = {
   title: string
   description: string
   aliases: string[]
+}
+
+export type ObjectItemTranslation = {
+  title: string
+  description: string
+  fandomWiki: string
 }
 
 export const LANGUAGE_STORAGE_KEY = 'map-language'
@@ -68,14 +78,34 @@ export async function changeLanguage(language: SupportedLanguage): Promise<void>
 
 /** Returns a public object title without ever exposing a technical `name_id`. */
 export function getItemTitle(language: SupportedLanguage, nameId: string): string | null {
-  const selectedTranslation = languageResources.find(({ code }) => code === language)?.translation
-  const englishTranslation = languageResources.find(({ code }) => code === 'en')?.translation
-  const selectedTitle = selectedTranslation?.items?.[nameId]?.title
-  const englishTitle = englishTranslation?.items?.[nameId]?.title
+  return getObjectItemTranslation(language, nameId)?.title ?? null
+}
 
-  if (typeof selectedTitle === 'string' && selectedTitle.trim()) return selectedTitle
-  if (typeof englishTitle === 'string' && englishTitle.trim()) return englishTitle
-  return null
+function getTranslation(language: SupportedLanguage): TranslationResource | undefined {
+  return languageResources.find(({ code }) => code === language)?.translation
+}
+
+function getLocalizedString(selected: unknown, english: unknown): string {
+  if (typeof selected === 'string' && selected.trim()) return selected
+  if (typeof english === 'string' && english.trim()) return english
+  return ''
+}
+
+/** Resolves every object field independently: selected locale, then English. */
+export function getObjectItemTranslation(language: SupportedLanguage, nameId: string): ObjectItemTranslation | null {
+  const selected = getTranslation(language)?.items?.[nameId]
+  const english = getTranslation('en')?.items?.[nameId]
+  if (!selected && !english) return null
+
+  return {
+    title: getLocalizedString(selected?.title, english?.title),
+    description: getLocalizedString(selected?.description, english?.description),
+    fandomWiki: getLocalizedString(selected?.fandom_wiki, english?.fandom_wiki),
+  }
+}
+
+export function getUntitledObjectTitle(language: SupportedLanguage): string {
+  return getLocalizedString(getTranslation(language)?.interface?.inspector?.untitled, getTranslation('en')?.interface?.inspector?.untitled) || 'Untitled'
 }
 
 /**
@@ -84,7 +114,7 @@ export function getItemTitle(language: SupportedLanguage, nameId: string): strin
  * translation file.
  */
 export function getSearchableTranslationItems(language: SupportedLanguage): SearchableTranslationItem[] {
-  const translation = languageResources.find(({ code }) => code === language)?.translation
+  const translation = getTranslation(language)
 
   return Object.entries(translation?.items ?? []).flatMap(([id, item]) => {
     if (typeof item.title !== 'string' || !item.title.trim()) return []
