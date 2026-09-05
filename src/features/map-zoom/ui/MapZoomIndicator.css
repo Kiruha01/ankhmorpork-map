@@ -11,3 +11,8 @@
   font-size: .875rem;
   font-weight: 600;
 }
+
+.app--mobile .map-zoom-indicator {
+  top: calc(max(.75rem, env(safe-area-inset-top)) + 4.25rem);
+  right: max(.75rem, env(safe-area-inset-right));
+}

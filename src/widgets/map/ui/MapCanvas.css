@@ -2,3 +2,29 @@
   height: 100vh;
   width: 100%;
 }
+
+/* MapLibre injects these controls outside React. */
+.map-canvas .maplibregl-ctrl-top-right {
+  top: 50%;
+  right: 1.25rem;
+  transform: translateY(-50%);
+}
+
+/* Keep controls above the mobile bottom sheet. */
+.app--mobile .map-canvas .maplibregl-ctrl-top-right {
+  top: calc(max(.75rem, env(safe-area-inset-top)) + 7rem);
+  right: max(.75rem, env(safe-area-inset-right));
+  transform: none;
+}
+
+/* The sheet owns the lower part of a short mobile viewport. */
+.app--mobile.app--inspector-open .map-canvas .maplibregl-ctrl-top-right {
+  visibility: hidden;
+}
+
+/* Keep MapLibre attribution clear of the bottom-right basemap picker. */
+.app--mobile .map-canvas .maplibregl-ctrl-bottom-right {
+  right: auto;
+  bottom: env(safe-area-inset-bottom);
+  left: var(--mobile-edge);
+}

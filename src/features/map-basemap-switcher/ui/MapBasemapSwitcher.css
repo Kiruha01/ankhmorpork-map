@@ -82,3 +82,21 @@
 .map-basemap-switcher__option:disabled {
   cursor: wait;
 }
+
+.app--mobile .map-basemap-switcher {
+  right: max(.75rem, env(safe-area-inset-right));
+  bottom: max(.75rem, env(safe-area-inset-bottom));
+}
+
+.app--mobile.app--inspector-open .map-basemap-switcher {
+  bottom: calc(min(70dvh, 32rem) + max(.75rem, env(safe-area-inset-bottom)));
+}
+
+.app--mobile .map-basemap-switcher__options {
+  width: calc(100vw - max(.75rem, env(safe-area-inset-left)) - max(.75rem, env(safe-area-inset-right)));
+}
+
+.app--mobile .map-basemap-switcher__option {
+  min-width: 0;
+  flex: 1 1 0;
+}

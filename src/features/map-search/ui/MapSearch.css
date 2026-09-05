@@ -112,3 +112,20 @@
 .map-search__result:focus-visible {
   background: #f1f5f9;
 }
+
+.app--mobile .map-search {
+  top: max(.75rem, env(safe-area-inset-top));
+  right: calc(max(.75rem, env(safe-area-inset-right)) + 3.25rem);
+  left: var(--mobile-edge);
+  width: auto;
+}
+
+/* Suggestions begin below the language row instead of covering that control. */
+.app--mobile .map-search__results {
+  max-height: calc(100dvh - max(.75rem, env(safe-area-inset-top)) - 7rem);
+  margin-top: 4.25rem;
+}
+
+.app--mobile.app--inspector-open .map-search__results {
+  max-height: max(0px, calc(30dvh - max(.75rem, env(safe-area-inset-top)) - 6.875rem));
+}

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   clearSearchInspectorSession,
+  getInspectorCameraPadding,
   getInspectorBackAction,
   openDirectObjectDetails,
   toSearchMapObjectFeature,
@@ -67,5 +68,19 @@ describe('inspector selection and Back', () => {
     expect([toSearchMapObjectFeature(secondObject)]).toEqual([
       { sourceId: 'streets-geojson', id: 2, feature: secondObject.feature },
     ])
+  })
+})
+
+describe('getInspectorCameraPadding', () => {
+  it('reserves the left panel on desktop', () => {
+    expect(getInspectorCameraPadding({ width: 376, height: 800, placement: 'left' })).toEqual({
+      top: 80, right: 80, bottom: 80, left: 400,
+    })
+  })
+
+  it('reserves the bottom sheet on mobile', () => {
+    expect(getInspectorCameraPadding({ width: 375, height: 420, placement: 'bottom' })).toEqual({
+      top: 80, right: 24, bottom: 444, left: 24,
+    })
   })
 })

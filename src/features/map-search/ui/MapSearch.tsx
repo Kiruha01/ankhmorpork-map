@@ -22,6 +22,15 @@ const VISIBLE_RESULTS_LIMIT = 8
 const SEARCH_ICON_URL = `${import.meta.env.BASE_URL}assets/icons/search.svg`
 export type SearchIntent = 'results' | 'direct-detail'
 
+/** A retained UI callback can outlive MapLibre's style during map teardown. */
+function isMapStyleReady(map: maplibregl.Map): boolean {
+  try {
+    return map.isStyleLoaded() === true
+  } catch {
+    return false
+  }
+}
+
 export function MapSearch({ map, getSearchFeatures, language, onSearchResults, onSearchReset, onClearReady, onHighlightsReady }: MapSearchProps) {
   const { t } = useTranslation()
   const [query, setQuery] = useState('')
@@ -30,7 +39,7 @@ export function MapSearch({ map, getSearchFeatures, language, onSearchResults, o
   const results = useMemo(() => searchItems(index, query), [index, query])
 
   const applyHighlights = useCallback((objects: readonly SearchMapObjectFeature[]) => {
-    if (!map) return
+    if (!map || !isMapStyleReady(map)) return
     MAP_OBJECT_DOMAINS.forEach(({ sourceId, applySearchResults }) => {
       applySearchResults(map, objects.filter((object) => object.sourceId === sourceId).map(({ id }) => id))
     })

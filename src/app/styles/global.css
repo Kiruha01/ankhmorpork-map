@@ -16,3 +16,7 @@ body {
   min-height: 100vh;
   position: relative;
 }
+
+.app--mobile {
+  --mobile-edge: max(.75rem, env(safe-area-inset-left));
+}

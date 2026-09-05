@@ -6,13 +6,14 @@ import {
   getInitialBaseMapVariant,
   type BaseMapVariantId,
 } from '../shared/config/map'
+import { MOBILE_MEDIA_QUERY, type InspectorPlacement } from '../shared/config/layout'
 import { MapBasemapSwitcher } from '../features/map-basemap-switcher/ui/MapBasemapSwitcher'
 import { MapLanguageSwitcher } from '../features/map-language/ui/MapLanguageSwitcher'
 import { MapPointerInfo } from '../features/map-pointer/ui/MapPointerInfo'
 import { MapSearch } from '../features/map-search/ui/MapSearch'
 import type { SearchIntent } from '../features/map-search/ui/MapSearch'
 import { MapZoomIndicator } from '../features/map-zoom/ui/MapZoomIndicator'
-import { ObjectInspector, type ObjectInspectorView } from '../features/object-inspector/ui/ObjectInspector'
+import { ObjectInspector, type ObjectInspectorSize, type ObjectInspectorView } from '../features/object-inspector/ui/ObjectInspector'
 import { createInspectableObject, relocalizeInspectableObject, type InspectableObject } from '../features/object-inspector/model/InspectableObject'
 import {
   closeInspectorCamera,
@@ -44,6 +45,24 @@ export type InspectorState =
 
 const CAMERA_GUTTER = 24
 const CAMERA_VERTICAL_PADDING = 80
+const MOBILE_CAMERA_HORIZONTAL_PADDING = 24
+
+export function getInspectorCameraPadding(size: ObjectInspectorSize): CameraPadding {
+  if (size.placement === 'bottom') {
+    return {
+      top: CAMERA_VERTICAL_PADDING,
+      right: MOBILE_CAMERA_HORIZONTAL_PADDING,
+      bottom: size.height + CAMERA_GUTTER,
+      left: MOBILE_CAMERA_HORIZONTAL_PADDING,
+    }
+  }
+  return {
+    top: CAMERA_VERTICAL_PADDING,
+    right: CAMERA_VERTICAL_PADDING,
+    bottom: CAMERA_VERTICAL_PADDING,
+    left: size.width + CAMERA_GUTTER,
+  }
+}
 
 function prefersReducedMotion(): boolean {
   return typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
@@ -99,12 +118,31 @@ export function App() {
   const [getObjectFeatureAtPoint, setObjectFeatureAtPointProvider] = useState<MapObjectFeatureAtPointProvider | null>(null)
   const [baseMapVariant, setBaseMapVariant] = useState<BaseMapVariantId>(getInitialBaseMapVariant)
   const [inspector, setInspector] = useState<InspectorState>(null)
-  const [panelWidth, setPanelWidth] = useState(0)
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.matchMedia(MOBILE_MEDIA_QUERY).matches)
+  const [isInspectorVisible, setIsInspectorVisible] = useState(false)
+  const [panelSize, setPanelSize] = useState<ObjectInspectorSize>({ width: 0, height: 0, placement: 'left' })
   const clearSearchRef = useRef<(() => void) | null>(null)
   const applyHighlightsRef = useRef<((objects: readonly SearchMapObjectFeature[]) => void) | null>(null)
   const objectPickRunRef = useRef(0)
   const appliedInspectorRef = useRef<{ map: maplibregl.Map; inspector: Exclude<InspectorState, null> } | null>(null)
   const language = i18n.resolvedLanguage ?? i18n.language ?? 'en'
+  const inspectorPlacement: InspectorPlacement = isMobile ? 'bottom' : 'left'
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(MOBILE_MEDIA_QUERY)
+    const legacyMediaQuery = mediaQuery as unknown as {
+      addListener?: (listener: () => void) => void
+      removeListener?: (listener: () => void) => void
+    }
+    const updateMobileState = () => setIsMobile(mediaQuery.matches)
+    updateMobileState()
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', updateMobileState)
+      return () => mediaQuery.removeEventListener('change', updateMobileState)
+    }
+    legacyMediaQuery.addListener?.(updateMobileState)
+    return () => legacyMediaQuery.removeListener?.(updateMobileState)
+  }, [])
 
   const changeBaseMapVariant = (variant: BaseMapVariantId) => {
     setBaseMapVariant(variant)
@@ -186,6 +224,16 @@ export function App() {
     applyHighlightsRef.current = apply
   }, [])
 
+  const handleInspectorSizeChange = useCallback((nextSize: ObjectInspectorSize) => {
+    setPanelSize((currentSize) => (
+      currentSize.width === nextSize.width
+      && currentSize.height === nextSize.height
+      && currentSize.placement === nextSize.placement
+        ? currentSize
+        : nextSize
+    ))
+  }, [])
+
   useEffect(() => {
     setInspector((current) => {
       if (!current || current.kind === 'results') return current
@@ -220,14 +268,9 @@ export function App() {
   }, [getObjectFeatureAtPoint, handleOpenDirectObject, language, map])
 
   useLayoutEffect(() => {
-    if (!map || !inspector || panelWidth === 0) return
+    if (!map || !inspector || panelSize.width === 0 || panelSize.height === 0 || panelSize.placement !== inspectorPlacement) return
 
-    const padding: CameraPadding = {
-      top: CAMERA_VERTICAL_PADDING,
-      right: CAMERA_VERTICAL_PADDING,
-      bottom: CAMERA_VERTICAL_PADDING,
-      left: panelWidth + CAMERA_GUTTER,
-    }
+    const padding = getInspectorCameraPadding(panelSize)
     const target = getInspectorCameraTarget(inspector)
     const wasOpened = appliedInspectorRef.current?.map === map
     if (wasOpened) {
@@ -236,7 +279,7 @@ export function App() {
       openInspectorCamera(map, target, padding, prefersReducedMotion(), OBJECT_INSPECTOR_MOTION)
     }
     appliedInspectorRef.current = { map, inspector }
-  }, [inspector, map, panelWidth])
+  }, [inspector, inspectorPlacement, map, panelSize])
 
   useLayoutEffect(() => {
     if (!map || inspector) return
@@ -255,7 +298,7 @@ export function App() {
       : null
 
   return (
-    <main className="app">
+    <main className={`app${isMobile ? ' app--mobile' : ''}${isMobile && isInspectorVisible ? ' app--inspector-open' : ''}`}>
       <MapCanvas
         onMapReady={setMap}
         onSearchFeaturesReady={handleSearchFeaturesReady}
@@ -277,7 +320,9 @@ export function App() {
         onSelect={handleSelectObject}
         onBack={handleBackToResults}
         onClose={handleCloseInspector}
-        onWidthChange={setPanelWidth}
+        placement={inspectorPlacement}
+        onSizeChange={handleInspectorSizeChange}
+        onVisibilityChange={setIsInspectorVisible}
       />
       <MapZoomIndicator map={map} />
       <MapLanguageSwitcher />

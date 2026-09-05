@@ -51,7 +51,9 @@ describe('ObjectInspector exit animation', () => {
       onSelect: vi.fn(),
       onBack: vi.fn(),
       onClose: vi.fn(),
-      onWidthChange: vi.fn(),
+      placement: 'left' as const,
+      onSizeChange: vi.fn(),
+      onVisibilityChange: vi.fn(),
     }
 
     act(() => {
@@ -66,6 +68,7 @@ describe('ObjectInspector exit animation', () => {
     expect(panel?.classList.contains('object-inspector--closing')).toBe(true)
     expect(panel?.getAttribute('aria-hidden')).toBe('true')
     expect(panel?.hasAttribute('inert')).toBe(true)
+    expect(props.onVisibilityChange).toHaveBeenLastCalledWith(true)
 
     act(() => {
       const event = new Event('animationend', { bubbles: true })
@@ -73,6 +76,7 @@ describe('ObjectInspector exit animation', () => {
       panel?.dispatchEvent(event)
     })
     expect(container.querySelector('aside')).toBeNull()
+    expect(props.onVisibilityChange).toHaveBeenLastCalledWith(false)
 
     act(() => root.unmount())
     container.remove()

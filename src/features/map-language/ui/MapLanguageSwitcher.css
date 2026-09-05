@@ -65,3 +65,14 @@
   background: #dbeafe;
   font-weight: 600;
 }
+
+.app--mobile .map-language-switcher {
+  top: calc(max(.75rem, env(safe-area-inset-top)) + 3.25rem);
+  right: auto;
+  left: var(--mobile-edge);
+}
+
+.app--mobile .map-language-switcher__options {
+  right: auto;
+  left: 0;
+}

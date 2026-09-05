@@ -2,18 +2,27 @@ import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from
 import { useTranslation } from 'react-i18next'
 import type { InspectableObject } from '../model/InspectableObject'
 import { OBJECT_INSPECTOR_MOTION } from '../model/motion'
+import type { InspectorPlacement } from '../../../shared/config/layout'
 import './ObjectInspector.css'
 
 export type ObjectInspectorView =
   | { kind: 'results'; objects: readonly InspectableObject[] }
   | { kind: 'details'; object: InspectableObject }
 
+export type ObjectInspectorSize = {
+  width: number
+  height: number
+  placement: InspectorPlacement
+}
+
 type ObjectInspectorProps = {
   view: ObjectInspectorView | null
   onSelect: (object: InspectableObject) => void
   onBack: () => void
   onClose: () => void
-  onWidthChange: (width: number) => void
+  placement: InspectorPlacement
+  onSizeChange: (size: ObjectInspectorSize) => void
+  onVisibilityChange: (visible: boolean) => void
 }
 
 export function getSafeExternalUrl(value: string): string | null {
@@ -35,7 +44,7 @@ function formatProperty(value: unknown): string {
   }
 }
 
-export function ObjectInspector({ view, onSelect, onBack, onClose, onWidthChange }: ObjectInspectorProps) {
+export function ObjectInspector({ view, onSelect, onBack, onClose, placement, onSizeChange, onVisibilityChange }: ObjectInspectorProps) {
   const { t } = useTranslation()
   const panelRef = useRef<HTMLElement>(null)
   const [displayedView, setDisplayedView] = useState(view)
@@ -72,23 +81,30 @@ export function ObjectInspector({ view, onSelect, onBack, onClose, onWidthChange
     return () => panel.removeEventListener('animationend', finishClosing)
   }, [closing])
 
+  useEffect(() => {
+    onVisibilityChange(Boolean(displayedView))
+  }, [displayedView, onVisibilityChange])
+
   useLayoutEffect(() => {
     const panel = panelRef.current
-    if (!panel || !displayedView || closing) {
-      onWidthChange(0)
+    if (!panel || !displayedView || closing || !view) {
+      onSizeChange({ width: 0, height: 0, placement })
       return
     }
 
-    const notifyWidth = () => onWidthChange(panel.getBoundingClientRect().width)
-    notifyWidth()
-    const observer = new ResizeObserver(notifyWidth)
+    const notifySize = () => {
+      const { width, height } = panel.getBoundingClientRect()
+      onSizeChange({ width, height, placement })
+    }
+    notifySize()
+    const observer = new ResizeObserver(notifySize)
     observer.observe(panel)
     return () => observer.disconnect()
-  }, [closing, displayedView, onWidthChange])
+  }, [closing, displayedView, onSizeChange, placement, view])
 
   if (!displayedView) return null
 
-  const panelClassName = `object-inspector${closing ? ' object-inspector--closing' : ''}`
+  const panelClassName = `object-inspector object-inspector--${placement}${closing ? ' object-inspector--closing' : ''}`
   const accessibilityProps = closing ? { 'aria-hidden': true, inert: true } : {}
   if (displayedView.kind === 'results') {
     return (
