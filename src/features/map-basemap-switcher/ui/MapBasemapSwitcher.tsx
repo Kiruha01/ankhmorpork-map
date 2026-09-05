@@ -4,19 +4,12 @@ import {
   BASE_MAP_VARIANTS,
   type BaseMapVariantId,
 } from '../../../entities/base-map/map/registerBaseMapLayer'
-import mapOriginalPreview from '../../../shared/assets/images/map_orig.jpg'
-import mapRussianPreview from '../../../shared/assets/images/map_rus.jpg'
 import './MapBasemapSwitcher.css'
 
 type MapBasemapSwitcherProps = {
   map: maplibregl.Map | null
   selectedVariant: BaseMapVariantId
   onVariantChange: (variant: BaseMapVariantId) => void
-}
-
-const previews: Record<BaseMapVariantId, string> = {
-  orig: mapOriginalPreview,
-  rus: mapRussianPreview,
 }
 
 const variantTranslationKeys: Record<BaseMapVariantId, string> = {
@@ -47,7 +40,7 @@ export function MapBasemapSwitcher({ map, selectedVariant, onVariantChange }: Ma
             disabled={!map}
             onClick={() => selectVariant(variant)}
           >
-            <img src={previews[variant]} alt={t('interface.basemap.previewAlt', { label: t(variantTranslationKeys[variant]) })} />
+            <img src={BASE_MAP_VARIANTS[variant].previewUrl} alt={t('interface.basemap.previewAlt', { label: t(variantTranslationKeys[variant]) })} />
             <span>{t(variantTranslationKeys[variant])}</span>
           </button>
         ))}

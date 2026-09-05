@@ -6,6 +6,7 @@ import { registerBaseMapLayer } from '../../../entities/base-map/map/registerBas
 import type { BaseMapVariantId } from '../../../shared/config/map'
 import type { SupportedLanguage } from '../../../shared/config/i18n'
 import { MAP_OPTIONS } from '../../../shared/config/map'
+import { getStoredMapCamera, saveMapCamera } from '../model/cameraStorage'
 import {
   MapObjectLayersController,
   type MapObjectFeatureAtPointProvider,
@@ -34,8 +35,11 @@ export function MapCanvas({ onMapReady, onSearchFeaturesReady, onObjectFeatureAt
   useEffect(() => {
     if (!containerRef.current) return
 
-    const map = new maplibregl.Map({ container: containerRef.current, ...MAP_OPTIONS })
+    const map = new maplibregl.Map({ container: containerRef.current, ...MAP_OPTIONS, ...getStoredMapCamera() })
     map.addControl(new maplibregl.NavigationControl(), 'top-right')
+
+    const saveCamera = () => saveMapCamera(map)
+    map.on('moveend', saveCamera)
 
     const onLoad = () => {
       registerBaseMapLayer(map)
@@ -50,6 +54,7 @@ export function MapCanvas({ onMapReady, onSearchFeaturesReady, onObjectFeatureAt
 
     return () => {
       map.off('load', onLoad)
+      map.off('moveend', saveCamera)
       objectLayersControllerRef.current?.destroy()
       objectLayersControllerRef.current = null
       onSearchFeaturesReady(null)

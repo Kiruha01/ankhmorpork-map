@@ -6,7 +6,6 @@ import type { SupportedLanguage } from '../../../shared/config/i18n'
 import type { MapObjectFeaturesProvider, SearchMapObjectFeature } from '../../../widgets/map/model/MapObjectLayersController'
 import { extendGeometryBounds } from '../model/geometryBounds'
 import { createSearchIndex, searchItems, type SearchResult } from '../model/searchIndex'
-import searchIcon from '../../../shared/assets/icons/search.svg'
 import './MapSearch.css'
 
 type MapSearchProps = {
@@ -20,6 +19,7 @@ type MapSearchProps = {
 }
 
 const VISIBLE_RESULTS_LIMIT = 8
+const SEARCH_ICON_URL = '/assets/icons/search.svg'
 export type SearchIntent = 'results' | 'direct-detail'
 
 export function MapSearch({ map, getSearchFeatures, language, onSearchResults, onSearchReset, onClearReady, onHighlightsReady }: MapSearchProps) {
@@ -134,7 +134,7 @@ export function MapSearch({ map, getSearchFeatures, language, onSearchResults, o
           </button>
         )}
         <button type="submit" className="map-search__submit" aria-label={t('interface.search.submit')}>
-          <img src={searchIcon} alt="" aria-hidden="true" />
+          <img src={SEARCH_ICON_URL} alt="" aria-hidden="true" />
         </button>
       </div>
 
