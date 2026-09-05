@@ -9,14 +9,14 @@ import { switchBaseMapVariant } from '../../../entities/base-map/map/registerBas
 import { registerStreetsLayer } from '../../../entities/street/map/registerStreetsLayer'
 import { applyStreetTheme } from '../../../entities/street/map/layers'
 import { STREETS_GEOJSON_URL, STREETS_SOURCE_ID } from '../../../entities/street/map/source'
-import { BASE_MAP_VARIANTS, type BaseMapVariantId } from '../../../shared/config/map'
+import { BASE_MAP_VARIANTS, type BaseMapVariantId, type OverlayTheme } from '../../../shared/config/map'
 import { LocalizedGeoJsonDataset } from '../../../shared/lib/geojson/localizedSource'
 import type { SupportedLanguage } from '../../../shared/config/i18n'
 
 type ObjectDomain = {
   sourceId: string
   dataset: LocalizedGeoJsonDataset
-  register: (map: maplibregl.Map) => void
+  register: (map: maplibregl.Map, theme: OverlayTheme) => void
 }
 
 /** Coordinates the one MapLibre instance with domain-owned sources and layers. */
@@ -48,8 +48,10 @@ export class MapObjectLayersController {
   ) {}
 
   initialize(): void {
-    this.domains.forEach(({ register }) => register(this.map))
-    this.applyBaseMapVariant()
+    const theme = BASE_MAP_VARIANTS[this.baseMapVariant].overlayTheme
+    this.domains.forEach(({ register }) => register(this.map, theme))
+    this.applyThemeImages(theme)
+    switchBaseMapVariant(this.map, this.baseMapVariant)
     this.refreshLocalizedSources()
   }
 
@@ -73,9 +75,24 @@ export class MapObjectLayersController {
   private applyBaseMapVariant(): void {
     const theme = BASE_MAP_VARIANTS[this.baseMapVariant].overlayTheme
     switchBaseMapVariant(this.map, this.baseMapVariant)
+    this.applyThemeImages(theme)
     applyBuildingTheme(this.map, theme)
     applyStreetTheme(this.map, theme)
     applyBeerTheme(this.map, theme)
+  }
+
+  private applyThemeImages(theme: OverlayTheme): void {
+    Object.entries(theme.images ?? {}).forEach(([name, image]) => {
+      if (this.map.hasImage(name)) return
+
+      void this.map.loadImage(image.url)
+        .then(({ data }) => {
+          if (!this.destroyed && !this.map.hasImage(name)) this.map.addImage(name, data, image.options)
+        })
+        .catch((error: unknown) => {
+          if (!this.destroyed) console.error(`Unable to load map image "${name}"`, error)
+        })
+    })
   }
 
   private refreshLocalizedSources(): void {
