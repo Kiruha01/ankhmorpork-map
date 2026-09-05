@@ -1,0 +1,69 @@
+{
+  "items": {
+    "street_small_god": {
+      "title": "Small god street",
+      "description": "",
+      "fandom_wiki": "",
+      "aliases": []
+    },
+    "street_short": {
+      "title": "Short street",
+      "description": "",
+      "fandom_wiki": "",
+      "aliases": ["small"]
+    },
+    "street_attic_bee": {
+      "title": "Attic bee street",
+      "description": "",
+      "fandom_wiki": "",
+      "aliases": []
+    },
+    "build_assassins": {
+      "title": "Assassin's guild",
+      "description": "",
+      "fandom_wiki": "",
+      "aliases": []
+    },
+    "build_post": {
+      "title": "Post office",
+      "description": "",
+      "fandom_wiki": "",
+      "aliases": ["mail"]
+    },
+    "build_opera": {
+      "title": "Openra house",
+      "description": "",
+      "fandom_wiki": "",
+      "aliases": ["sing", "song"]
+    },
+    "house_citywatch": {
+      "title": "City watch",
+      "description": "",
+      "fandom_wiki": "",
+      "aliases": []
+    }
+  },
+  "interface": {
+    "map": {
+      "ariaLabel": "Map with GeoJSON objects"
+    },
+    "basemap": {
+      "ariaLabel": "Map basemap selection",
+      "trigger": "Map: {{label}}",
+      "original": "Original",
+      "russian": "Russian",
+      "previewAlt": "Preview of the {{label}} basemap"
+    },
+    "zoom": {
+      "indicator": "Zoom: {{value}}"
+    },
+    "pointer": {
+      "position": "Screen: {{x}}, {{y}} · Coordinates: {{lng}}, {{lat}}"
+    },
+    "language": {
+      "menuLabel": "Interface language selection",
+      "name": "English",
+      "flag": "🇬🇧"
+    }
+  }
+}

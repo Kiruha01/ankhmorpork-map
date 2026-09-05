@@ -1,0 +1,13 @@
+.map-zoom-indicator {
+  position: absolute;
+  z-index: 1;
+  top: 1.25rem;
+  left: 1.25rem;
+  padding: .5rem .75rem;
+  border-radius: .5rem;
+  color: #172033;
+  background: rgb(255 255 255 / 94%);
+  box-shadow: 0 4px 12px rgb(26 42 66 / 16%);
+  font-size: .875rem;
+  font-weight: 600;
+}

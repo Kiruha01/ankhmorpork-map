@@ -1,0 +1,69 @@
+{
+  "items": {
+    "street_small_god": {
+      "title": "Улица малых богов",
+      "description": "",
+      "fandom_wiki": "",
+      "aliases": []
+    },
+    "street_short": {
+      "title": "Короткая улица",
+      "description": "",
+      "fandom_wiki": "",
+      "aliases": ["small"]
+    },
+    "street_attic_bee": {
+      "title": null,
+      "description": "",
+      "fandom_wiki": "",
+      "aliases": []
+    },
+    "build_assassins": {
+      "title": "Гильдия убийц",
+      "description": "",
+      "fandom_wiki": "",
+      "aliases": []
+    },
+    "build_post": {
+      "title": "Почта",
+      "description": "",
+      "fandom_wiki": "",
+      "aliases": ["mail"]
+    },
+    "build_opera": {
+      "title": "Дом оперы",
+      "description": "",
+      "fandom_wiki": "",
+      "aliases": ["sing", "song"]
+    },
+    "house_citywatch": {
+      "title": "Городская стража",
+      "description": "",
+      "fandom_wiki": "",
+      "aliases": []
+    }
+  },
+  "interface": {
+    "map": {
+      "ariaLabel": "Карта с GeoJSON-объектами"
+    },
+    "basemap": {
+      "ariaLabel": "Выбор подложки карты",
+      "trigger": "Карта: {{label}}",
+      "original": "Оригинал",
+      "russian": "Русский",
+      "previewAlt": "Превью подложки «{{label}}»"
+    },
+    "zoom": {
+      "indicator": "Зум: {{value}}"
+    },
+    "pointer": {
+      "position": "Экран: {{x}}, {{y}} · Координаты: {{lng}}, {{lat}}"
+    },
+    "language": {
+      "menuLabel": "Выбор языка интерфейса",
+      "name": "Русский",
+      "flag": "🇷🇺"
+    }
+  }
+}

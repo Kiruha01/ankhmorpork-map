@@ -1,0 +1,14 @@
+.map-pointer-info {
+  position: absolute;
+  z-index: 1;
+  top: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(50%, 44rem);
+  padding: .625rem;
+  border-radius: .25rem;
+  color: #222;
+  background: #fff;
+  font-size: .75rem;
+  text-align: center;
+}

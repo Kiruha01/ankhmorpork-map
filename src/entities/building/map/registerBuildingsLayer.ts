@@ -1,7 +1,7 @@
 import maplibregl from 'maplibre-gl'
 import type { Geometry } from 'geojson'
 
-const SOURCE_ID = 'buildings-geojson'
+export const BUILDINGS_SOURCE_ID = 'buildings-geojson'
 
 const source = {
   type: 'geojson' as const,
@@ -10,28 +10,12 @@ const source = {
 
 const fillLayer: maplibregl.FillLayerSpecification = {
   id: 'buildings-fill',
-  type: 'fill' as const,
-  source: SOURCE_ID,
+  type: 'fill',
+  source: BUILDINGS_SOURCE_ID,
   filter: ['==', '$type', 'Polygon'],
   paint: {
-    'fill-color': [
-      'case',
-      ['get', 'is_landmark'],
-      '#c1ed30',
-      '#9b9b9b'
-    ],
+    'fill-color': ['case', ['get', 'is_landmark'], '#c1ed30', '#9b9b9b'],
     'fill-opacity': 0.35,
-  },
-}
-
-const outlineLayer: maplibregl.LineLayerSpecification = {
-  id: 'buildings-outline',
-  type: 'line' as const,
-  source: SOURCE_ID,
-  filter: ['==', '$type', 'Polygon'],
-  paint: {
-    'line-color': '#f60000',
-    'line-width': 2,
   },
 }
 
@@ -61,20 +45,19 @@ function extendBoundsFromGeometry(bounds: maplibregl.LngLatBounds, geometry: Geo
 function fitMapToBuildings(map: maplibregl.Map): void {
   const bounds = new maplibregl.LngLatBounds()
   const hasCoordinates = map
-    .querySourceFeatures(SOURCE_ID)
+    .querySourceFeatures(BUILDINGS_SOURCE_ID)
     .reduce((hasFeatures, feature) => extendBoundsFromGeometry(bounds, feature.geometry) || hasFeatures, false)
 
   if (hasCoordinates) map.fitBounds(bounds, { padding: 48, maxZoom: 18 })
 }
 
-export function addBuildingsLayer(map: maplibregl.Map): void {
-  map.addSource(SOURCE_ID, source)
+export function registerBuildingsLayer(map: maplibregl.Map): void {
+  map.addSource(BUILDINGS_SOURCE_ID, source)
   map.addLayer(fillLayer)
-  // map.addLayer(outlineLayer)
 
   let buildingsFitted = false
   map.on('sourcedata', (event) => {
-    if (buildingsFitted || event.sourceId !== SOURCE_ID || !event.isSourceLoaded) return
+    if (buildingsFitted || event.sourceId !== BUILDINGS_SOURCE_ID || !event.isSourceLoaded) return
 
     fitMapToBuildings(map)
     buildingsFitted = true
