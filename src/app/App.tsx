@@ -94,6 +94,23 @@ export function toSearchMapObjectFeature(object: InspectableObject): SearchMapOb
   return { sourceId: object.sourceId, id: object.id, feature: object.feature }
 }
 
+/** Keeps the picked object first while including every raw feature with its name. */
+export function getObjectsWithSameNameId(
+  selected: SearchMapObjectFeature,
+  features: readonly SearchMapObjectFeature[],
+): SearchMapObjectFeature[] {
+  const nameId = selected.feature.properties?.name_id
+  if (typeof nameId !== 'string' || !nameId.trim()) return [selected]
+
+  const selectedKey = `${selected.sourceId}:${selected.id}`
+  const related = features.filter((feature) => (
+    feature.feature.properties?.name_id === nameId
+    && `${feature.sourceId}:${feature.id}` !== selectedKey
+  ))
+
+  return [selected, ...related]
+}
+
 export function openDirectObjectDetails(object: InspectableObject): InspectorState {
   return { kind: 'details', object }
 }
@@ -124,6 +141,7 @@ export function App() {
   const clearSearchRef = useRef<(() => void) | null>(null)
   const applyHighlightsRef = useRef<((objects: readonly SearchMapObjectFeature[]) => void) | null>(null)
   const objectPickRunRef = useRef(0)
+  const objectSelectionRunRef = useRef(0)
   const appliedInspectorRef = useRef<{ map: maplibregl.Map; inspector: Exclude<InspectorState, null> } | null>(null)
   const language = i18n.resolvedLanguage ?? i18n.language ?? 'en'
   const inspectorPlacement: InspectorPlacement = isMobile ? 'bottom' : 'left'
@@ -165,8 +183,9 @@ export function App() {
     }
 
     if (intent === 'direct-detail') {
+      objectSelectionRunRef.current += 1
       const object = createInspectableObject(objects[0], language)
-      applyHighlightsRef.current?.([toSearchMapObjectFeature(object)])
+      applyHighlightsRef.current?.(objects)
       setInspector(openDirectObjectDetails(object))
       return
     }
@@ -192,8 +211,24 @@ export function App() {
     clearSearchRef.current?.()
   }, [])
 
+  const getObjectHighlightGroup = useCallback(async (selected: SearchMapObjectFeature): Promise<SearchMapObjectFeature[]> => {
+    if (!getSearchFeatures) return [selected]
+
+    try {
+      return getObjectsWithSameNameId(selected, await getSearchFeatures())
+    } catch (error: unknown) {
+      console.error('Unable to load related map objects', error)
+      return [selected]
+    }
+  }, [getSearchFeatures])
+
   const handleSelectObject = useCallback((object: InspectableObject) => {
-    applyHighlightsRef.current?.([toSearchMapObjectFeature(object)])
+    const selectionRun = ++objectSelectionRunRef.current
+    const selected = toSearchMapObjectFeature(object)
+    void getObjectHighlightGroup(selected).then((highlights) => {
+      if (selectionRun !== objectSelectionRunRef.current) return
+      applyHighlightsRef.current?.(highlights)
+    })
     setInspector((current) => ({
       kind: 'details',
       object,
@@ -203,10 +238,10 @@ export function App() {
           ? current.returnToResults
           : undefined,
     }))
-  }, [])
+  }, [getObjectHighlightGroup])
 
-  const handleOpenDirectObject = useCallback((object: InspectableObject) => {
-    applyHighlightsRef.current?.([toSearchMapObjectFeature(object)])
+  const handleOpenDirectObject = useCallback((object: InspectableObject, highlights: readonly SearchMapObjectFeature[]) => {
+    applyHighlightsRef.current?.(highlights)
     setInspector(openDirectObjectDetails(object))
   }, [])
 
@@ -251,12 +286,17 @@ export function App() {
     const handleMapClick = (event: maplibregl.MapMouseEvent) => {
       if (event.originalEvent.button !== 0) return
       const pickRun = ++objectPickRunRef.current
+      const selectionRun = ++objectSelectionRunRef.current
       const picker = getObjectFeatureAtPoint
       const selectedMap = map
       void picker(event.point)
-        .then((feature) => {
+        .then(async (feature) => {
           if (pickRun !== objectPickRunRef.current || map !== selectedMap || getObjectFeatureAtPoint !== picker) return
-          if (feature) handleOpenDirectObject(createInspectableObject(feature, language))
+          if (!feature) return
+
+          const highlights = await getObjectHighlightGroup(feature)
+          if (pickRun !== objectPickRunRef.current || selectionRun !== objectSelectionRunRef.current || map !== selectedMap || getObjectFeatureAtPoint !== picker) return
+          handleOpenDirectObject(createInspectableObject(feature, language), highlights)
         })
         .catch((error: unknown) => console.error('Unable to inspect map object', error))
     }
@@ -265,7 +305,7 @@ export function App() {
       objectPickRunRef.current += 1
       map.off('click', handleMapClick)
     }
-  }, [getObjectFeatureAtPoint, handleOpenDirectObject, language, map])
+  }, [getObjectFeatureAtPoint, getObjectHighlightGroup, handleOpenDirectObject, language, map])
 
   useLayoutEffect(() => {
     if (!map || !inspector || panelSize.width === 0 || panelSize.height === 0 || panelSize.placement !== inspectorPlacement) return

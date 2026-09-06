@@ -3,6 +3,7 @@ import {
   clearSearchInspectorSession,
   getInspectorCameraPadding,
   getInspectorBackAction,
+  getObjectsWithSameNameId,
   openDirectObjectDetails,
   toSearchMapObjectFeature,
   type InspectorState,
@@ -68,6 +69,26 @@ describe('inspector selection and Back', () => {
     expect([toSearchMapObjectFeature(secondObject)]).toEqual([
       { sourceId: 'streets-geojson', id: 2, feature: secondObject.feature },
     ])
+  })
+
+  it('groups a clicked object with every feature that shares its name_id', () => {
+    const selected = {
+      sourceId: 'parks-geojson',
+      id: 1,
+      feature: { properties: { name_id: 'park_smarsh' } } as never,
+    }
+    const matching = {
+      sourceId: 'squares-geojson',
+      id: 2,
+      feature: { properties: { name_id: 'park_smarsh' } } as never,
+    }
+    const other = {
+      sourceId: 'buildings-geojson',
+      id: 3,
+      feature: { properties: { name_id: 'build_assassins' } } as never,
+    }
+
+    expect(getObjectsWithSameNameId(selected, [selected, matching, other])).toEqual([selected, matching])
   })
 })
 

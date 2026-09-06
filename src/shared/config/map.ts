@@ -32,6 +32,12 @@ export type OverlayTheme = {
     marker: LayerTheme<CircleLayerSpecification>
     labels: LayerTheme<SymbolLayerSpecification>
   }
+  parks: {
+    labels: LayerTheme<SymbolLayerSpecification>
+  }
+  squares: {
+    labels: LayerTheme<SymbolLayerSpecification>
+  }
 }
 
 /** A concise override for one base-map variant. Unspecified layers keep the defaults. */
@@ -40,6 +46,8 @@ export type OverlayThemePatch = {
   buildings?: Partial<OverlayTheme['buildings']>
   streets?: Partial<OverlayTheme['streets']>
   beers?: Partial<OverlayTheme['beers']>
+  parks?: Partial<OverlayTheme['parks']>
+  squares?: Partial<OverlayTheme['squares']>
 }
 
 /*
@@ -154,6 +162,32 @@ const DEFAULT_OVERLAY_THEME: OverlayTheme = {
       paint: { 'text-color': '#201914', 'text-halo-color': '#feffe4', 'text-halo-width': 1.2 },
     },
   },
+  parks: {
+    labels: {
+      minzoom: 14,
+      layout: {
+        'text-field': ['coalesce', ['get', 'label'], ''],
+        'text-font': ['Open Sans Regular'],
+        'text-size': ['interpolate', ['linear'], ['zoom'], 14, 11, 18, 16],
+        'text-max-width': 12,
+        'text-allow-overlap': false,
+      },
+      paint: { 'text-color': '#436033', 'text-halo-color': '#feffe4', 'text-halo-width': 1.2 },
+    },
+  },
+  squares: {
+    labels: {
+      minzoom: 14,
+      layout: {
+        'text-field': ['coalesce', ['get', 'label'], ''],
+        'text-font': ['Open Sans Regular'],
+        'text-size': ['interpolate', ['linear'], ['zoom'], 14, 11, 18, 16],
+        'text-max-width': 12,
+        'text-allow-overlap': false,
+      },
+      paint: { 'text-color': '#6d4c33', 'text-halo-color': '#feffe4', 'text-halo-width': 1.2 },
+    },
+  },
 }
 
 function mergeLayerTheme<T extends FillLayerSpecification | LineLayerSpecification | CircleLayerSpecification | SymbolLayerSpecification>(
@@ -172,7 +206,7 @@ function mergeLayerTheme<T extends FillLayerSpecification | LineLayerSpecificati
 
 /** Creates an independent complete theme while keeping a variant declaration small. */
 export function createOverlayTheme(patch: OverlayThemePatch = {}): OverlayTheme {
-  const { buildings, streets, beers } = DEFAULT_OVERLAY_THEME
+  const { buildings, streets, beers, parks, squares } = DEFAULT_OVERLAY_THEME
 
   return {
     images: patch.images,
@@ -190,6 +224,12 @@ export function createOverlayTheme(patch: OverlayThemePatch = {}): OverlayTheme 
     beers: {
       marker: mergeLayerTheme(beers.marker, patch.beers?.marker),
       labels: mergeLayerTheme(beers.labels, patch.beers?.labels),
+    },
+    parks: {
+      labels: mergeLayerTheme(parks.labels, patch.parks?.labels),
+    },
+    squares: {
+      labels: mergeLayerTheme(squares.labels, patch.squares?.labels),
     },
   }
 }

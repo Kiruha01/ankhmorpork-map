@@ -10,10 +10,12 @@
       "title": "Короткая улица",
       "description": "Самая короткая улица в городе, хотя некоторые так не считают",
       "fandom_wiki": "",
-      "aliases": ["small"]
+      "aliases": [
+        "small"
+      ]
     },
     "street_attic_bee": {
-      "title": null,
+      "title": "Улица чердачной пчелы",
       "description": "",
       "fandom_wiki": "",
       "aliases": []
@@ -34,19 +36,513 @@
       "title": "Почта",
       "description": "",
       "fandom_wiki": "",
-      "aliases": ["mail"]
+      "aliases": [
+        "mail"
+      ]
     },
     "build_opera": {
       "title": "Дом оперы",
       "description": "",
       "fandom_wiki": "",
-      "aliases": ["sing", "song"]
+      "aliases": [
+        "sing",
+        "song"
+      ]
     },
     "house_citywatch": {
       "title": "Городская стража",
       "description": "Поскольку Дракон сжёг полицейский участок на улице Паточной Шахты, леди Овнец подарила Ночной Страже новое здание, принадлежавшее семье Овнец — Псевдополис-Ярд. ",
       "fandom_wiki": "https://discworld.fandom.com/ru/wiki/%D0%93%D0%BE%D1%80%D0%BE%D0%B4%D1%81%D0%BA%D0%B0%D1%8F_%D1%81%D1%82%D1%80%D0%B0%D0%B6%D0%B0",
-      "aliases": ["Ваймс", "штаб квартира"]
+      "aliases": [
+        "Ваймс",
+        "штаб квартира"
+      ]
+    },
+    "street_merchan": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_ettercap": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_kicklebury": {
+      "title": "Пиночная улица",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_alice": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_dodney": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_bernicks": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_coper": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_caulk": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_caulk_yard": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_seckless": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_foundlink": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_bankrupt": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_bookkepers": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_threelamp": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_passet": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_1": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_audit": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "steet_scoone": {
+      "title": "Лепешечная улица",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_kings_down": {
+      "title": "Королевский спуск",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_kings_way": {
+      "title": "Королевская дорога",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_prouts": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_seven_sleep": {
+      "title": "Семь спящих",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_speedwell": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "street_park_line": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "sq_dolly_sist": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "sq_fubsy": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "sq_sator": {
+      "title": "Саторская площадь",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "sq_cham": {
+      "title": "Чамская улица",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "sq_br_moons": {
+      "title": "Площадь разбитых лун",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "sq_barbican": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "sq_bricjfields": {
+      "title": "Ремонтная площадка на месте драконьего приземления",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "sq_sticken": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "sq_hen_chickens": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "sq_water_market": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "park_smarsh": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "park_petricians": {
+      "title": "Угодья патриция",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "park_cockled": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "park_hipo": {
+      "title": "Стадион Гипо",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "park_hide": {
+      "title": "Гад-парк",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "park_killing": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "park_tump": {
+      "title": "Бугор",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "park_naphill": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "park_small_gods": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "park_apothecary": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "park_wizards": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_patryci": {
+      "title": "Дворец патриция",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_fools": {
+      "title": "Гильдия шутов",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "bulid_musicans": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_blind": {
+      "title": "Храм слепого ИО",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_small_gods": {
+      "title": "Храм мелких богов",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_seven_handed": {
+      "title": "Храм семирукого сека",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_offlers_croc": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_om": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_teachers": {
+      "title": "Гильдия учителей",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_baker": {
+      "title": "Гильдия пекарей",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_merchants": {
+      "title": "Гильдия торговцев",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_thieves": {
+      "title": "Гильдия воров",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_plumbers": {
+      "title": "Гильдия осенизаторщиков",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_alchemists": {
+      "title": "Гильдия алхимиков",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_lawyers": {
+      "title": "Гильдия законников",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_haberdashers": {
+      "title": "Гильдия галантерейщиков",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_gamblers": {
+      "title": "Гильдия азартных игроков",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_embalmers": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_butchers": {
+      "title": "Гильдия мясников",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_fate": {
+      "title": "Храм судьбы",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_royal_bank": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_mint": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_troll_emb": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_low_king": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_measures": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_cattle_mar": {
+      "title": "Скотный рынок",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_custom": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_racecourse": {
+      "title": "Ипподром",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_disk": {
+      "title": "Дискум",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_tanty": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_university": {
+      "title": "Незримый университет",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_conjurers": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_beggars": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_seamstresses": {
+      "title": null,
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_old_citywatch": {
+      "title": "Старое здание стражи",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
+    },
+    "build_ramkin": {
+      "title": "Дом Сибиллы Овнец",
+      "description": null,
+      "fandom_wiki": null,
+      "aliases": null
     }
   },
   "interface": {
