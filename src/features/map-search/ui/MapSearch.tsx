@@ -34,6 +34,7 @@ function isMapStyleReady(map: maplibregl.Map): boolean {
 export function MapSearch({ map, getSearchFeatures, language, onSearchResults, onSearchReset, onClearReady, onHighlightsReady }: MapSearchProps) {
   const { t } = useTranslation()
   const [query, setQuery] = useState('')
+  const [isFocused, setIsFocused] = useState(false)
   const searchRunRef = useRef(0)
   const index = useMemo(() => createSearchIndex(language), [language])
   const results = useMemo(() => searchItems(index, query), [index, query])
@@ -115,6 +116,10 @@ export function MapSearch({ map, getSearchFeatures, language, onSearchResults, o
     <form
       className="map-search"
       role="search"
+      onFocus={() => setIsFocused(true)}
+      onBlur={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget)) setIsFocused(false)
+      }}
       onSubmit={(event) => {
         event.preventDefault()
         void runSearch(results, 'results')
@@ -130,7 +135,7 @@ export function MapSearch({ map, getSearchFeatures, language, onSearchResults, o
           placeholder={t('interface.search.placeholder')}
           autoComplete="off"
           aria-controls="map-search-results"
-          aria-expanded={query.trim().length > 0}
+          aria-expanded={isFocused && query.trim().length > 0}
           onChange={(event) => setQuery(event.target.value)}
           onKeyDown={(event) => {
             if (event.key !== 'Escape') return
@@ -147,7 +152,7 @@ export function MapSearch({ map, getSearchFeatures, language, onSearchResults, o
         </button>
       </div>
 
-      {query.trim() && (
+      {isFocused && query.trim() && (
         <ul id="map-search-results" className="map-search__results" aria-label={t('interface.search.resultsLabel')}>
           {results.slice(0, VISIBLE_RESULTS_LIMIT).map((result) => (
             <li key={result.id}>
@@ -155,6 +160,7 @@ export function MapSearch({ map, getSearchFeatures, language, onSearchResults, o
                 type="button"
                 className="map-search__result"
                 onClick={() => {
+                  setIsFocused(false)
                   setQuery(result.title)
                   void runSearch([result], 'direct-detail')
                 }}
