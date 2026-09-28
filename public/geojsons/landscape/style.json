@@ -29,7 +29,6 @@
     }
   },
   "sprite": "",
-  "glyphs": "https://orangemug.github.io/font-glyphs/glyphs/{fontstack}/{range}.pbf",
   "layers": [
     {
       "id": "ground_back",

@@ -271,7 +271,10 @@ export function getInitialBaseMapVariant(): BaseMapVariantId {
 export const MAP_OPTIONS: Omit<import('maplibre-gl').MapOptions, 'container'> = {
   style: {
     version: 8,
-    glyphs: 'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf',
+    glyphs: `${new URL(
+      `${import.meta.env.BASE_URL}assets/glyphs/`,
+      typeof window === 'undefined' ? 'http://localhost' : window.location.origin,
+    ).href}{fontstack}/{range}.pbf`,
     sources: {},
     layers: [],
   },
