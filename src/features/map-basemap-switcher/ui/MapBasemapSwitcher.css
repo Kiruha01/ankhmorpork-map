@@ -40,6 +40,7 @@
 }
 
 .map-basemap-switcher:hover .map-basemap-switcher__options,
+.map-basemap-switcher--open .map-basemap-switcher__options,
 .map-basemap-switcher:focus-within .map-basemap-switcher__options {
   opacity: 1;
   pointer-events: auto;

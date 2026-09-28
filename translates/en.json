@@ -551,6 +551,7 @@
       "trigger": "Map: {{label}}",
       "original": "Original",
       "russian": "Russian",
+      "landscape": "Landscape",
       "previewAlt": "Preview of the {{label}} basemap"
     },
     "zoom": {

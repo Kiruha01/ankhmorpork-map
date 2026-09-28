@@ -7,7 +7,7 @@ import type {
 } from 'maplibre-gl'
 import type { LayerTheme } from '../lib/map/layerTheme'
 
-export type BaseMapVariantId = 'orig' | 'rus'
+export type BaseMapVariantId = 'orig' | 'rus' | 'landscape'
 
 export const BASE_MAP_VARIANT_STORAGE_KEY = 'map-basemap-variant'
 
@@ -234,15 +234,28 @@ export function createOverlayTheme(patch: OverlayThemePatch = {}): OverlayTheme 
   }
 }
 
-export const BASE_MAP_VARIANTS: Record<BaseMapVariantId, { tilesUrl: string; previewUrl: string; overlayTheme: OverlayTheme }> = {
+type BaseMapVariant = {
+  previewUrl: string
+  overlayTheme: OverlayTheme
+} & ({ type: 'raster'; tilesUrl: string } | { type: 'vector'; styleUrl: string })
+
+export const BASE_MAP_VARIANTS: Record<BaseMapVariantId, BaseMapVariant> = {
   orig: {
+    type: 'raster',
     tilesUrl: 'https://tiles.klisov.ru/orig/{z}/{x}/{y}.jpg',
     previewUrl: `${import.meta.env.BASE_URL}assets/images/map_orig.jpg`,
     overlayTheme: createOverlayTheme(),
   },
   rus: {
+    type: 'raster',
     tilesUrl: 'https://tiles.klisov.ru/rus/{z}/{x}/{y}.jpg',
     previewUrl: `${import.meta.env.BASE_URL}assets/images/map_rus.jpg`,
+    overlayTheme: createOverlayTheme(),
+  },
+  landscape: {
+    type: 'vector',
+    styleUrl: `${import.meta.env.BASE_URL}geojsons/landscape/style.json`,
+    previewUrl: `${import.meta.env.BASE_URL}assets/images/map_landscape.svg`,
     overlayTheme: createOverlayTheme(),
   },
 }
