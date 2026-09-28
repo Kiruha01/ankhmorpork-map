@@ -546,6 +546,7 @@
     }
   },
   "interface": {
+    "siteTitle": "Карта Анк-Морпорка",
     "map": {
       "ariaLabel": "Карта с GeoJSON-объектами"
     },

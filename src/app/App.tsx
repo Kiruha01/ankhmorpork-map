@@ -129,7 +129,7 @@ export function getInspectorBackAction(current: InspectorState): {
 }
 
 export function App() {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const [map, setMap] = useState<maplibregl.Map | null>(null)
   const [getSearchFeatures, setSearchFeaturesProvider] = useState<MapObjectFeaturesProvider | null>(null)
   const [getObjectFeatureAtPoint, setObjectFeatureAtPointProvider] = useState<MapObjectFeatureAtPointProvider | null>(null)
@@ -145,6 +145,10 @@ export function App() {
   const appliedInspectorRef = useRef<{ map: maplibregl.Map; inspector: Exclude<InspectorState, null> } | null>(null)
   const language = i18n.resolvedLanguage ?? i18n.language ?? 'en'
   const inspectorPlacement: InspectorPlacement = isMobile ? 'bottom' : 'left'
+
+  useEffect(() => {
+    document.title = t('interface.siteTitle')
+  }, [language, t])
 
   useEffect(() => {
     const mediaQuery = window.matchMedia(MOBILE_MEDIA_QUERY)

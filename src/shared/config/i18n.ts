@@ -9,6 +9,7 @@ type TranslationResource = {
     aliases?: unknown
   }>
   interface?: {
+    siteTitle?: string
     language?: {
       name?: string
       flag?: string

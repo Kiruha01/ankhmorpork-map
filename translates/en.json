@@ -543,6 +543,7 @@
     }
   },
   "interface": {
+    "siteTitle": "Ankh-Morpork Map",
     "map": {
       "ariaLabel": "Map with GeoJSON objects"
     },
