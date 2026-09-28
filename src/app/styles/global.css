@@ -13,6 +13,7 @@ body {
 }
 
 .app {
+  --inspector-width: 27rem;
   min-height: 100vh;
   position: relative;
 }

@@ -5,12 +5,13 @@
   bottom: 0;
   left: 0;
   display: flex;
-  width: min(23rem, calc(100vw - 1.5rem));
+  width: min(var(--inspector-width), calc(100vw - 1.5rem));
   flex-direction: column;
   overflow: hidden;
-  border-right: 1px solid rgba(15, 23, 42, .16);
-  background: rgba(255, 255, 255, .97);
-  box-shadow: 2px 0 18px rgba(15, 23, 42, .16);
+  padding-top: 5.75rem;
+  border-right: 1px solid #e8eaee;
+  background: #fff;
+  box-shadow: 4px 0 24px rgb(15 23 42 / 17%);
   animation: object-inspector-slide-in var(--object-inspector-motion-duration) var(--object-inspector-motion-easing);
 }
 
@@ -21,70 +22,88 @@
 
 .object-inspector__header {
   display: flex;
-  min-height: 3.25rem;
+  min-height: 3.75rem;
   align-items: center;
   justify-content: space-between;
-  gap: .5rem;
-  padding: .5rem .75rem;
-  border-bottom: 1px solid rgba(15, 23, 42, .12);
+  gap: .75rem;
+  padding: .5rem 1.25rem;
+  border-bottom: 1px solid #e8eaee;
 }
 
 .object-inspector__header h2,
 .object-inspector__details h2,
 .object-inspector__debug h3 { margin: 0; }
-
-.object-inspector__header h2 { font-size: 1rem; }
+.object-inspector__header h2 { font-size: 1.05rem; font-weight: 650; }
 
 .object-inspector__icon-button,
 .object-inspector__back {
   border: 0;
   background: transparent;
-  color: #1e293b;
+  color: #5a626d;
   cursor: pointer;
   font: inherit;
 }
 
-.object-inspector__icon-button { font-size: 1.5rem; line-height: 1; }
-.object-inspector__back { padding: .35rem; font-weight: 600; }
+.object-inspector__icon-button {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: .5rem;
+  font-size: 1.6rem;
+  line-height: 1;
+}
+.object-inspector__back { padding: .35rem 0; font-weight: 600; }
+.object-inspector__icon-button:hover,
+.object-inspector__back:hover { color: #1b2432; }
+.object-inspector__icon-button:focus-visible,
+.object-inspector__back:focus-visible,
+.object-inspector__handle:focus-visible { outline: 2px solid #2563eb; outline-offset: 2px; }
 
-.object-inspector__results { overflow-y: auto; padding: .5rem; }
-
+.object-inspector__results { min-height: 0; overflow-y: auto; }
 .object-inspector__tile {
   display: flex;
   width: 100%;
-  min-height: 4.5rem;
+  min-height: 5.5rem;
   flex-direction: column;
   align-items: flex-start;
-  gap: .3rem;
-  margin-bottom: .5rem;
-  padding: .7rem;
-  border: 1px solid #cbd5e1;
-  border-radius: .5rem;
+  justify-content: center;
+  gap: .35rem;
+  padding: 1rem 1.3rem;
+  border: 0;
+  border-bottom: 1px solid #eceef1;
   background: #fff;
-  color: #0f172a;
+  color: #222832;
   cursor: pointer;
   text-align: left;
 }
-
 .object-inspector__tile:hover,
-.object-inspector__tile:focus-visible { border-color: #2563eb; background: #eff6ff; outline: none; }
-.object-inspector__tile-title { font-weight: 700; }
-.object-inspector__tile-description { color: #475569; font-size: .875rem; }
+.object-inspector__tile:focus-visible { background: #f5f7fa; outline: none; }
+.object-inspector__tile-title { font-size: 1.06rem; font-weight: 650; line-height: 1.35; }
+.object-inspector__tile-description {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #858b94;
+  font-size: .9rem;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
 
-.object-inspector__details { overflow-y: auto; padding: 1rem .9rem; }
-.object-inspector__description { margin: .75rem 0; color: #334155; white-space: pre-wrap; }
+.object-inspector__details { min-height: 0; overflow-y: auto; padding: 1.25rem; }
+.object-inspector__details h2 { font-size: 1.45rem; line-height: 1.25; }
+.object-inspector__description { margin: .8rem 0 1rem; color: #626b77; line-height: 1.55; white-space: pre-wrap; }
 .object-inspector__fandom-link { color: #1d4ed8; overflow-wrap: anywhere; }
 
 .object-inspector__debug {
   margin-top: auto;
   max-height: 38%;
   overflow: auto;
-  padding: .75rem .9rem;
-  background: #f1f5f9;
+  padding: .75rem 1.25rem;
+  background: #f4f6f8;
   color: #64748b;
   font-size: .75rem;
 }
-
 .object-inspector__debug h3 { margin-bottom: .5rem; color: #475569; font-size: .75rem; }
 .object-inspector__debug dl { margin: 0; }
 .object-inspector__debug dl > div { display: grid; grid-template-columns: minmax(0, 42%) minmax(0, 1fr); gap: .5rem; padding: .2rem 0; }
@@ -95,7 +114,6 @@
   from { transform: translateX(-100%); }
   to { transform: translateX(0); }
 }
-
 @keyframes object-inspector-slide-out {
   from { transform: translateX(0); }
   to { transform: translateX(-100%); }
@@ -107,25 +125,51 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  height: min(70dvh, 32rem);
+  height: min(36dvh, 25rem);
   max-width: none;
-  border: 1px solid rgba(15, 23, 42, .16);
-  border-bottom: 0;
-  border-radius: 1rem 1rem 0 0;
-  box-shadow: 0 -2px 18px rgba(15, 23, 42, .16);
+  min-height: 12rem;
+  padding-top: 0;
   padding-bottom: env(safe-area-inset-bottom);
+  border: 1px solid #e8eaee;
+  border-bottom: 0;
+  border-radius: 1.4rem 1.4rem 0 0;
+  box-shadow: 0 -4px 28px rgb(15 23 42 / 18%);
   animation-name: object-inspector-sheet-in;
+  transition: height 260ms ease;
 }
-
-.object-inspector--bottom.object-inspector--closing {
-  animation-name: object-inspector-sheet-out;
+.object-inspector--bottom.object-inspector--expanded {
+  height: min(72dvh, calc(100dvh - max(.75rem, env(safe-area-inset-top)) - 5.5rem));
 }
+.object-inspector--bottom.object-inspector--peek {
+  height: calc(2rem + env(safe-area-inset-bottom));
+  min-height: 0;
+}
+.object-inspector--bottom.object-inspector--closing { animation-name: object-inspector-sheet-out; }
+.object-inspector__handle {
+  display: grid;
+  flex: 0 0 2rem;
+  place-items: center;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: grab;
+  touch-action: none;
+}
+.object-inspector__handle span {
+  width: 2.25rem;
+  height: .28rem;
+  border-radius: 1rem;
+  background: #c7cbd1;
+}
+.object-inspector--bottom .object-inspector__header { padding: .2rem 1.25rem .5rem; }
+.object-inspector--bottom .object-inspector__tile { min-height: 4.6rem; }
+.object-inspector--bottom .object-inspector__details { padding-top: 1rem; }
 
 @keyframes object-inspector-sheet-in {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 }
-
 @keyframes object-inspector-sheet-out {
   from { transform: translateY(0); }
   to { transform: translateY(100%); }
@@ -133,5 +177,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .object-inspector,
-  .object-inspector--closing { animation: none; }
+  .object-inspector--closing { animation: none; transition: none; }
 }

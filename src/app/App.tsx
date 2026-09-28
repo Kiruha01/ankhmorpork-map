@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import maplibregl from 'maplibre-gl'
 import { useTranslation } from 'react-i18next'
 import {
@@ -338,7 +338,10 @@ export function App() {
       : null
 
   return (
-    <main className={`app${isMobile ? ' app--mobile' : ''}${isMobile && isInspectorVisible ? ' app--inspector-open' : ''}`}>
+    <main
+      className={`app${isMobile ? ' app--mobile' : ''}${isMobile && isInspectorVisible ? ' app--inspector-open' : ''}`}
+      style={{ '--mobile-sheet-height': `${panelSize.height}px` } as CSSProperties}
+    >
       <MapCanvas
         onMapReady={setMap}
         onSearchFeaturesReady={handleSearchFeaturesReady}

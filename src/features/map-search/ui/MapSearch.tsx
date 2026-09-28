@@ -122,11 +122,14 @@ export function MapSearch({ map, getSearchFeatures, language, onSearchResults, o
       }}
       onSubmit={(event) => {
         event.preventDefault()
+        setIsFocused(false)
+        event.currentTarget.querySelector('input')?.blur()
         void runSearch(results, 'results')
       }}
     >
       <label className="map-search__label" htmlFor="map-search-input">{t('interface.search.label')}</label>
       <div className="map-search__field">
+        <span className="map-search__pin" aria-hidden="true" />
         <input
           id="map-search-input"
           className="map-search__input"
@@ -142,14 +145,14 @@ export function MapSearch({ map, getSearchFeatures, language, onSearchResults, o
             resetSearch()
           }}
         />
+        <button type="submit" className="map-search__submit" aria-label={t('interface.search.submit')}>
+          <img src={SEARCH_ICON_URL} alt="" aria-hidden="true" />
+        </button>
         {query && (
           <button type="button" className="map-search__reset" aria-label={t('interface.search.reset')} onClick={resetSearch}>
             <span aria-hidden="true">×</span>
           </button>
         )}
-        <button type="submit" className="map-search__submit" aria-label={t('interface.search.submit')}>
-          <img src={SEARCH_ICON_URL} alt="" aria-hidden="true" />
-        </button>
       </div>
 
       {isFocused && query.trim() && (
@@ -165,7 +168,8 @@ export function MapSearch({ map, getSearchFeatures, language, onSearchResults, o
                   void runSearch([result], 'direct-detail')
                 }}
               >
-                {result.title}
+                <span className="map-search__result-title">{result.title}</span>
+                {result.description && <span className="map-search__result-description">{result.description}</span>}
               </button>
             </li>
           ))}

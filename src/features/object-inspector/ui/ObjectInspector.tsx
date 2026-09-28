@@ -15,6 +15,17 @@ export type ObjectInspectorSize = {
   placement: InspectorPlacement
 }
 
+type SheetPosition = 'peek' | 'normal' | 'expanded'
+
+function moveSheet(position: SheetPosition, direction: 'up' | 'down'): SheetPosition {
+  if (direction === 'up') return position === 'peek' ? 'normal' : 'expanded'
+  return position === 'expanded' ? 'normal' : 'peek'
+}
+
+function toggleSheet(position: SheetPosition): SheetPosition {
+  return position === 'peek' ? 'normal' : position === 'expanded' ? 'normal' : 'peek'
+}
+
 type ObjectInspectorProps = {
   view: ObjectInspectorView | null
   onSelect: (object: InspectableObject) => void
@@ -49,6 +60,14 @@ export function ObjectInspector({ view, onSelect, onBack, onClose, placement, on
   const panelRef = useRef<HTMLElement>(null)
   const [displayedView, setDisplayedView] = useState(view)
   const [closing, setClosing] = useState(false)
+  const [sheetPosition, setSheetPosition] = useState<SheetPosition>('normal')
+  const dragStartY = useRef<number | null>(null)
+  const viewIdentity = view?.kind === 'details'
+    ? `details:${view.object.sourceId}:${view.object.id}`
+    : view?.kind === 'results'
+      ? `results:${view.objects.map(({ sourceId, id }) => `${sourceId}:${id}`).join(',')}`
+      : null
+  const previousViewIdentity = useRef(viewIdentity)
   const motionStyle = {
     '--object-inspector-motion-duration': `${OBJECT_INSPECTOR_MOTION.durationMs}ms`,
     '--object-inspector-motion-easing': OBJECT_INSPECTOR_MOTION.cssEasing,
@@ -82,8 +101,19 @@ export function ObjectInspector({ view, onSelect, onBack, onClose, placement, on
   }, [closing])
 
   useEffect(() => {
-    onVisibilityChange(Boolean(displayedView))
-  }, [displayedView, onVisibilityChange])
+    onVisibilityChange(Boolean(displayedView) && (placement !== 'bottom' || sheetPosition !== 'peek'))
+  }, [displayedView, onVisibilityChange, placement, sheetPosition])
+
+  useEffect(() => {
+    if (!view) setSheetPosition('normal')
+  }, [view])
+
+  useEffect(() => {
+    if (viewIdentity !== previousViewIdentity.current && viewIdentity !== null) {
+      setSheetPosition('normal')
+    }
+    previousViewIdentity.current = viewIdentity
+  }, [viewIdentity])
 
   useLayoutEffect(() => {
     const panel = panelRef.current
@@ -104,28 +134,60 @@ export function ObjectInspector({ view, onSelect, onBack, onClose, placement, on
 
   if (!displayedView) return null
 
-  const panelClassName = `object-inspector object-inspector--${placement}${closing ? ' object-inspector--closing' : ''}`
+  const panelClassName = `object-inspector object-inspector--${placement}${placement === 'bottom' ? ` object-inspector--${sheetPosition}` : ''}${closing ? ' object-inspector--closing' : ''}`
   const accessibilityProps = closing ? { 'aria-hidden': true, inert: true } : {}
+  const isPeek = placement === 'bottom' && sheetPosition === 'peek'
+  const sheetHandle = placement === 'bottom' && (
+    <button
+      type="button"
+      className="object-inspector__handle"
+      aria-label={t(sheetPosition === 'peek' ? 'interface.inspector.show' : sheetPosition === 'expanded' ? 'interface.inspector.collapse' : 'interface.inspector.hide')}
+      aria-expanded={sheetPosition !== 'peek'}
+      onPointerDown={(event) => {
+        dragStartY.current = event.clientY
+        event.currentTarget.setPointerCapture(event.pointerId)
+      }}
+      onPointerUp={(event) => {
+        if (dragStartY.current === null) return
+        const movement = event.clientY - dragStartY.current
+        dragStartY.current = null
+        setSheetPosition((current) => Math.abs(movement) < 36
+          ? toggleSheet(current)
+          : moveSheet(current, movement < 0 ? 'up' : 'down'))
+      }}
+      onPointerCancel={() => { dragStartY.current = null }}
+      onClick={(event) => {
+        if (event.detail === 0) setSheetPosition(toggleSheet)
+      }}
+    >
+      <span />
+    </button>
+  )
   if (displayedView.kind === 'results') {
     return (
       <aside ref={panelRef} className={panelClassName} style={motionStyle} aria-label={t('interface.inspector.resultsAriaLabel')} {...accessibilityProps}>
-        <header className="object-inspector__header">
-          <h2>{t('interface.inspector.resultsTitle')}</h2>
-          <button type="button" className="object-inspector__icon-button" aria-label={t('interface.inspector.close')} onClick={onClose}>×</button>
-        </header>
-        <div className="object-inspector__results">
-          {displayedView.objects.map((object) => (
-            <button
-              key={`${object.sourceId}:${object.id}`}
-              type="button"
-              className="object-inspector__tile"
-              onClick={() => onSelect(object)}
-            >
-              <span className="object-inspector__tile-title">{object.title}</span>
-              {object.description && <span className="object-inspector__tile-description">{object.description}</span>}
-            </button>
-          ))}
-        </div>
+        {sheetHandle}
+        {!isPeek && (
+          <>
+            <header className="object-inspector__header">
+              <h2>{t('interface.inspector.resultsTitle')}</h2>
+              <button type="button" className="object-inspector__icon-button" aria-label={t('interface.inspector.close')} onClick={onClose}>×</button>
+            </header>
+            <div className="object-inspector__results">
+              {displayedView.objects.map((object) => (
+                <button
+                  key={`${object.sourceId}:${object.id}`}
+                  type="button"
+                  className="object-inspector__tile"
+                  onClick={() => onSelect(object)}
+                >
+                  <span className="object-inspector__tile-title">{object.title}</span>
+                  {object.description && <span className="object-inspector__tile-description">{object.description}</span>}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </aside>
     )
   }
@@ -136,25 +198,30 @@ export function ObjectInspector({ view, onSelect, onBack, onClose, placement, on
 
   return (
     <aside ref={panelRef} className={panelClassName} style={motionStyle} aria-label={t('interface.inspector.detailsAriaLabel')} {...accessibilityProps}>
-      <header className="object-inspector__header">
-        <button type="button" className="object-inspector__back" onClick={onBack}>← {t('interface.inspector.back')}</button>
-        <button type="button" className="object-inspector__icon-button" aria-label={t('interface.inspector.close')} onClick={onClose}>×</button>
-      </header>
-      <div className="object-inspector__details">
-        <h2>{object.title}</h2>
-        {object.description && <p className="object-inspector__description">{object.description}</p>}
-        {url && <a className="object-inspector__fandom-link" href={url} target="_blank" rel="noreferrer noopener">{t('interface.inspector.fandomLink')}</a>}
-      </div>
-      <section className="object-inspector__debug" aria-label={t('interface.inspector.geoJsonAttributes')}>
-        <h3>{t('interface.inspector.geoJsonAttributes')}</h3>
-        <dl>
-          <div><dt>{t('interface.inspector.sourceId')}</dt><dd>{object.sourceId}</dd></div>
-          <div><dt>{t('interface.inspector.featureId')}</dt><dd>{String(object.id)}</dd></div>
-          {Object.entries(properties).map(([key, value]) => (
-            <div key={key}><dt>{key}</dt><dd>{formatProperty(value)}</dd></div>
-          ))}
-        </dl>
-      </section>
+      {sheetHandle}
+      {!isPeek && (
+        <>
+          <header className="object-inspector__header">
+            <button type="button" className="object-inspector__back" onClick={onBack}>← {t('interface.inspector.back')}</button>
+            <button type="button" className="object-inspector__icon-button" aria-label={t('interface.inspector.close')} onClick={onClose}>×</button>
+          </header>
+          <div className="object-inspector__details">
+            <h2>{object.title}</h2>
+            {object.description && <p className="object-inspector__description">{object.description}</p>}
+            {url && <a className="object-inspector__fandom-link" href={url} target="_blank" rel="noreferrer noopener">{t('interface.inspector.fandomLink')}</a>}
+          </div>
+          <section className="object-inspector__debug" aria-label={t('interface.inspector.geoJsonAttributes')}>
+            <h3>{t('interface.inspector.geoJsonAttributes')}</h3>
+            <dl>
+              <div><dt>{t('interface.inspector.sourceId')}</dt><dd>{object.sourceId}</dd></div>
+              <div><dt>{t('interface.inspector.featureId')}</dt><dd>{String(object.id)}</dd></div>
+              {Object.entries(properties).map(([key, value]) => (
+                <div key={key}><dt>{key}</dt><dd>{formatProperty(value)}</dd></div>
+              ))}
+            </dl>
+          </section>
+        </>
+      )}
     </aside>
   )
 }
