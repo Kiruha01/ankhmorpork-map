@@ -1,0 +1,125 @@
+name: Publish PR preview
+
+on:
+  workflow_run:
+    workflows: [Build PR preview]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: write
+  pull-requests: write
+
+jobs:
+  verify:
+    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: read
+    outputs:
+      number: ${{ steps.verify.outputs.number }}
+      head_sha: ${{ steps.verify.outputs.head_sha }}
+      current: ${{ steps.verify.outputs.current }}
+    steps:
+      - name: Download preview artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pr-preview
+          path: preview-artifact
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Verify artifact belongs to the current PR head
+        id: verify
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const metadata = JSON.parse(fs.readFileSync('preview-artifact/metadata.json', 'utf8'));
+            const run = context.payload.workflow_run;
+            const number = metadata.number;
+            if (!Number.isSafeInteger(number) || number < 1 ||
+                metadata.runId !== run.id ||
+                metadata.headSha !== run.head_sha ||
+                metadata.headRepoId !== run.head_repository?.id ||
+                run.repository?.id !== context.payload.repository.id) {
+              core.setFailed('Preview artifact does not match its workflow run');
+              return;
+            }
+            const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: number });
+            if (pr.state !== 'open' ||
+                pr.base.repo.id !== context.payload.repository.id ||
+                pr.head.repo?.id !== metadata.headRepoId ||
+                pr.head.sha !== metadata.headSha) {
+              core.info('PR was closed or updated after this build; skipping stale preview');
+              return;
+            }
+            if (!fs.existsSync('preview-artifact/site/index.html')) {
+              core.setFailed('Preview artifact has no site/index.html');
+              return;
+            }
+            core.setOutput('number', number);
+            core.setOutput('head_sha', metadata.headSha);
+            core.setOutput('current', 'true');
+
+  publish:
+    needs: verify
+    if: needs.verify.outputs.current == 'true'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pr-preview-${{ needs.verify.outputs.number }}
+      cancel-in-progress: false
+    steps:
+      - name: Check out trusted code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Download preview artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pr-preview
+          path: preview-artifact
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Recheck PR after entering publication queue
+        id: current
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ needs.verify.outputs.number }}
+          PR_HEAD_SHA: ${{ needs.verify.outputs.head_sha }}
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              ...context.repo,
+              pull_number: Number(process.env.PR_NUMBER),
+            });
+            if (pr.state === 'open' && pr.head.sha === process.env.PR_HEAD_SHA) {
+              core.setOutput('current', 'true');
+            } else {
+              core.info('PR was closed or updated while waiting to publish');
+            }
+
+      - name: Deploy preview
+        if: steps.current.outputs.current == 'true'
+        id: preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          action: deploy
+          pr-number: ${{ needs.verify.outputs.number }}
+          source-dir: ./preview-artifact/site
+          preview-branch: gh-pages
+          comment: false
+          wait-for-pages-deployment: true
+          deploy-commit-message: Deploy preview for PR ${{ needs.verify.outputs.number }}
+
+      - name: Comment with preview URL
+        if: steps.current.outputs.current == 'true'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          number: ${{ needs.verify.outputs.number }}
+          header: pr-preview
+          message: 'Preview: ${{ steps.preview.outputs.preview-url }}'
