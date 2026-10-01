@@ -10,7 +10,11 @@ npm run dev
 
 ## Деплой в GitHub Pages
 
-Workflow [deploy-pages.yml](.github/workflows/deploy-pages.yml) запускается при каждом push в `master` и вручную из вкладки **Actions**. Он публикует собранное приложение по пути репозитория, поэтому его нужно включить один раз в настройках репозитория: **Settings → Pages → Build and deployment → Source → GitHub Actions**.
+Workflow [deploy-pages.yml](.github/workflows/deploy-pages.yml) запускается при каждом push в `master` и вручную из вкладки **Actions**. Он публикует собранное приложение в корень ветки `gh-pages`, сохраняя каталог `pr-preview`.
+
+Workflow [pr-preview.yml](.github/workflows/pr-preview.yml) собирает отдельную версию для каждого PR, включая PR из форков, с токеном только для чтения. [publish-pr-preview.yml](.github/workflows/publish-pr-preview.yml) получает artifact успешной сборки, сверяет его с актуальной веткой PR и публикует по адресу `https://kiruha01.github.io/ankhmorpork-map/pr-preview/pr-<номер>/`. [remove-pr-preview.yml](.github/workflows/remove-pr-preview.yml) удаляет превью после закрытия PR. Ссылка появляется и обновляется в комментарии к PR. Для PR из форков GitHub может потребовать одобрения запуска workflow по правилам репозитория.
+
+Для публикации настройте **Settings → Pages → Build and deployment → Source → Deploy from a branch**, выберите ветку `gh-pages` и каталог `/ (root)`. Если ветки ещё нет, сначала запустите workflow основного деплоя из **Actions**, затем выберите её в настройках Pages. В **Settings → Actions → General → Workflow permissions** включите **Read and write permissions**. Workflow публикации по `workflow_run` начнёт срабатывать после появления его файла в основной ветке репозитория.
 
 ## Устройство
 
