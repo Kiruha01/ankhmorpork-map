@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="Landscape map preview">
-  <rect width="320" height="180" fill="#eedcb3"/>
-  <path d="M0 18 76 0l87 46-22 32-89 1L0 55Zm190-18h130v50l-49 29-67-24Zm-16 119 71-34 75 28v67H169Z" fill="#93c279" stroke="#217e41" stroke-width="2"/>
-  <path d="M0 119 46 99l65 33 58-31 54 22 97-36v23l-95 41-57-24-59 31-70-32-39 16Z" fill="#67bbfc" stroke="#7a634e" stroke-width="3"/>
-  <path d="M-12 71 57 93l77-13 58 31 95-46 48 15M80-15l61 81-14 114m136-198-41 86 21 125" fill="none" stroke="#c69f7a" stroke-width="13" stroke-linejoin="round"/>
-  <path d="m11 7 43 20 19 34-54 26Zm95 8 40 12-8 29-30-4Zm83 21 36 6-12 33-45-8ZM40 137l33 10-16 31-32-11Zm89 9 30-14 15 32-33 15Zm153-6 24 11-11 25-27-7Z" fill="#c5ae82" stroke="#72633e" stroke-width="2"/>
-</svg>
