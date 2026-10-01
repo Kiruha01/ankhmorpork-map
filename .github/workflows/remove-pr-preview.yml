@@ -1,39 +1,105 @@
 name: Remove PR preview
 
 on:
-  pull_request_target:
-    types: [closed]
+  workflow_run:
+    workflows: [Mark PR preview closed]
+    types: [completed]
 
 permissions:
+  actions: read
   contents: write
   pull-requests: write
 
-concurrency:
-  group: pr-preview-${{ github.event.number }}
-  cancel-in-progress: false
-
 jobs:
-  remove:
+  verify:
+    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: read
+    outputs:
+      number: ${{ steps.verify.outputs.number }}
+      closed: ${{ steps.verify.outputs.closed }}
+    steps:
+      - name: Download closure artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pr-preview-closed
+          path: preview-closed
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Verify closed PR
+        id: verify
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const metadata = JSON.parse(fs.readFileSync('preview-closed/metadata.json', 'utf8'));
+            const run = context.payload.workflow_run;
+            const number = metadata.number;
+            if (!Number.isSafeInteger(number) || number < 1 ||
+                metadata.runId !== run.id ||
+                run.repository?.id !== context.payload.repository.id) {
+              core.setFailed('Closure artifact does not match its workflow run');
+              return;
+            }
+            const { data: pr } = await github.rest.pulls.get({ ...context.repo, pull_number: number });
+            if (pr.state !== 'closed' ||
+                pr.base.repo.id !== context.payload.repository.id ||
+                pr.head.sha !== metadata.headSha) {
+              core.info('PR is open or its head differs from the closure artifact');
+              return;
+            }
+            core.setOutput('number', number);
+            core.setOutput('closed', 'true');
+
+  remove:
+    needs: verify
+    if: needs.verify.outputs.closed == 'true'
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pr-preview-${{ needs.verify.outputs.number }}
+      cancel-in-progress: false
     steps:
       - name: Check out trusted code
         uses: actions/checkout@v4
         with:
           persist-credentials: false
 
+      - name: Recheck PR after entering publication queue
+        id: current
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ needs.verify.outputs.number }}
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              ...context.repo,
+              pull_number: Number(process.env.PR_NUMBER),
+            });
+            if (pr.state === 'closed') {
+              core.setOutput('closed', 'true');
+            } else {
+              core.info('PR was reopened while waiting to remove the preview');
+            }
+
       - name: Remove preview
+        if: steps.current.outputs.closed == 'true'
         uses: rossjrw/pr-preview-action@v1
         with:
           action: remove
-          pr-number: ${{ github.event.number }}
+          pr-number: ${{ needs.verify.outputs.number }}
           preview-branch: gh-pages
           comment: false
-          remove-commit-message: Remove preview for PR ${{ github.event.number }}
+          remove-commit-message: Remove preview for PR ${{ needs.verify.outputs.number }}
 
       - name: Update preview comment
+        if: steps.current.outputs.closed == 'true'
         uses: marocchino/sticky-pull-request-comment@v2
         with:
-          number: ${{ github.event.number }}
+          number: ${{ needs.verify.outputs.number }}
           header: pr-preview
           only_update: true
           message: Preview removed because the PR was closed.

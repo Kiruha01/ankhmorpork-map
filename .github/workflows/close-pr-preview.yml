@@ -1,0 +1,28 @@
+name: Mark PR preview closed
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+
+jobs:
+  mark-closed:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record closed PR
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          mkdir -p preview-closed
+          node -e "require('fs').writeFileSync('preview-closed/metadata.json', JSON.stringify({number: Number(process.env.PR_NUMBER), headSha: process.env.PR_HEAD_SHA, runId: Number(process.env.GITHUB_RUN_ID)}))"
+
+      - name: Upload closure artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-preview-closed
+          path: preview-closed/
+          if-no-files-found: error
+          retention-days: 3

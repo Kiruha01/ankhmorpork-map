@@ -81,15 +81,12 @@ const DEFAULT_OVERLAY_THEME: OverlayTheme = {
   buildings: {
     fill: {
       paint: {
-        'fill-color': ['case', ['get', 'is_landmark'], '#b39b0038', '#56360038'],
-        'fill-opacity': ['interpolate', ['linear'], ['zoom'], 13, 0.2, 16, 0.52, 19, 0.72],
+        'fill-opacity': 0,
       },
     },
     outline: {
       paint: {
-        'line-color': '#666633',
-        'line-opacity': ['interpolate', ['linear'], ['zoom'], 13, 0.3, 17, 0.85],
-        'line-width': ['interpolate', ['linear'], ['zoom'], 13, 0.4, 17, 1.4, 20, 2.5],
+        'line-opacity': 0,
       },
     },
     labels: {
@@ -252,7 +249,7 @@ type BaseMapVariant = {
 export const BASE_MAP_VARIANTS: Record<BaseMapVariantId, BaseMapVariant> = {
   orig: {
     visibilityOptions: [
-      { id: 'orig-buildings', labelKey: 'interface.layers.buildings', defaultVisible: true, targets: [{ domain: 'buildings', layers: ['fill', 'outline', 'labels'] }] },
+      { id: 'orig-buildings', labelKey: 'interface.layers.labels', defaultVisible: true, targets: [{ domain: 'buildings', layers: ['labels'] }] },
       { id: 'orig-streets', labelKey: 'interface.layers.streets', defaultVisible: false, targets: [{ domain: 'streets', layers: ['yard', 'street', 'main', 'labels'] }] },
       { id: 'orig-places', labelKey: 'interface.layers.places', defaultVisible: true, targets: [{ domain: 'parks', layers: ['labels'] }, { domain: 'squares', layers: ['labels'] }] },
       { id: 'orig-beers', labelKey: 'interface.layers.beers', defaultVisible: true, targets: [{ domain: 'beers', layers: ['marker', 'labels'] }] },
@@ -272,23 +269,23 @@ export const BASE_MAP_VARIANTS: Record<BaseMapVariantId, BaseMapVariant> = {
     tilesUrl: 'https://tiles.klisov.ru/rus/{z}/{x}/{y}.jpg',
     previewUrl: `${import.meta.env.BASE_URL}assets/images/map_rus.jpg`,
     overlayTheme: createOverlayTheme({
-  buildings: {
-    fill: {
-      paint: {
-        'fill-color': '#00000000',
+      buildings: {
+        fill: {
+          paint: {
+            'fill-color': '#00000000',
+          },
+        },
+        outline: {
+          paint: {
+            'line-color': '#00000000',
+          }
+        },
       },
-    },
-    outline: {
-      paint: {
-        'line-color': '#00000000',
-      }
-    },
-  },
-}),
+    }),
   },
   landscape: {
     visibilityOptions: [
-      { id: 'landscape-buildings', labelKey: 'interface.layers.buildings', defaultVisible: true, targets: [{ domain: 'buildings', layers: ['fill', 'outline', 'labels'] }] },
+      { id: 'landscape-buildings', labelKey: 'interface.layers.buildings', defaultVisible: true, targets: [{ domain: 'buildings', layers: ['labels'] }] },
       { id: 'landscape-streets', labelKey: 'interface.layers.streets', defaultVisible: true, targets: [{ domain: 'streets', layers: ['yard', 'street', 'main', 'labels'] }] },
       { id: 'landscape-streets-lines', labelKey: 'interface.layers.streetLines', defaultVisible: false, targets: [{ domain: 'streets', layers: ['yard', 'street', 'main'] }] },
       { id: 'landscape-parks', labelKey: 'interface.layers.parks', defaultVisible: true, targets: [{ domain: 'parks', layers: ['labels'] }] },
