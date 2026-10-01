@@ -546,6 +546,34 @@
     }
   },
   "interface": {
+    "layers": {
+      "button": "Слои",
+      "title": "Настройки карты",
+      "mapType": "Вид карты",
+      "options": "Слои карты",
+      "display": "Отображение",
+      "showZoom": "Показывать значение zoom",
+      "buildings": "Здания",
+      "streets": "Улицы",
+      "places": "Парки и площади",
+      "beers": "Пабы",
+      "labels": "Подписи объектов",
+      "buildingShapes": "Контуры зданий",
+      "streetLines": "Линии улиц",
+      "parks": "Подписи парков",
+      "squares": "Подписи площадей"
+    },
+    "markers": {
+      "button": "Маркеры",
+      "title": "Маркеры на карте",
+      "landmarks": "Достопримечательности",
+      "landmarksDescription": "Интересные места города",
+      "meeting": "Места встреч",
+      "meetingDescription": "Точки для встреч с друзьями",
+      "landmarkTitle": "Демо: достопримечательность",
+      "meetingTitle": "Демо: место встречи",
+      "mockDescription": "Демонстрационный маркер. Каталог маркеров будет расширяться."
+    },
     "siteTitle": "Карта Анк-Морпорка",
     "map": {
       "ariaLabel": "Карта с GeoJSON-объектами"

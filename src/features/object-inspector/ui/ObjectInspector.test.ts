@@ -82,3 +82,24 @@ describe('ObjectInspector exit animation', () => {
     container.remove()
   })
 })
+
+
+describe('ObjectInspector display settings', () => {
+  it('hides GeoJSON attributes while keeping the object details visible', () => {
+    const container = document.createElement('div')
+    document.body.append(container)
+    const root = createRoot(container)
+    const props = {
+      view: { kind: 'details' as const, object: inspectorObject },
+      onSelect: vi.fn(), onBack: vi.fn(), onClose: vi.fn(), placement: 'left' as const,
+      onSizeChange: vi.fn(), onVisibilityChange: vi.fn(),
+    }
+    act(() => root.render(createElement(ObjectInspector, { ...props, showAttributes: true })))
+    expect(container.querySelector('section')?.textContent).toContain('buildings-geojson')
+    act(() => root.render(createElement(ObjectInspector, { ...props, showAttributes: false })))
+    expect(container.querySelector('section')).toBeNull()
+    expect(container.querySelector('h2')?.textContent).toBe('Inspector object')
+    act(() => root.unmount())
+    container.remove()
+  })
+})

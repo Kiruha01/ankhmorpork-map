@@ -2,7 +2,7 @@ import type maplibregl from 'maplibre-gl'
 import { switchBaseMapVariant } from '../../../entities/base-map/map/registerBaseMapLayer'
 import { MAP_OBJECT_DOMAINS } from '../../../entities/map-object/map/domains'
 import type { MapObjectDomain } from '../../../entities/map-object/map/types'
-import { BASE_MAP_VARIANTS, type BaseMapVariantId, type OverlayTheme } from '../../../shared/config/map'
+import { getVisibleOverlayTheme, type LayerVisibility, type BaseMapVariantId, type OverlayTheme } from '../../../shared/config/map'
 import { LocalizedGeoJsonDataset } from '../../../shared/lib/geojson/localizedSource'
 import type { MapObjectFeature } from '../../../shared/lib/geojson/types'
 import type { SupportedLanguage } from '../../../shared/config/i18n'
@@ -38,10 +38,11 @@ export class MapObjectLayersController {
     private readonly map: maplibregl.Map,
     private language: SupportedLanguage,
     private baseMapVariant: BaseMapVariantId,
+    private visibility: LayerVisibility = {},
   ) {}
 
   initialize(): void {
-    const theme = BASE_MAP_VARIANTS[this.baseMapVariant].overlayTheme
+    const theme = getVisibleOverlayTheme(this.baseMapVariant, this.visibility)
     this.domains.forEach(({ register }) => register(this.map, theme))
     this.applyThemeImages(theme)
     switchBaseMapVariant(this.map, this.baseMapVariant)
@@ -54,10 +55,12 @@ export class MapObjectLayersController {
     this.refreshLocalizedSources()
   }
 
-  setBaseMapVariant(variant: BaseMapVariantId): void {
-    if (variant === this.baseMapVariant) return
+  setBaseMapVariant(variant: BaseMapVariantId, visibility: LayerVisibility = {}): void {
+    if (variant === this.baseMapVariant && visibility === this.visibility) return
+    const variantChanged = variant !== this.baseMapVariant
+    this.visibility = visibility
     this.baseMapVariant = variant
-    this.applyBaseMapVariant()
+    this.applyBaseMapVariant(variantChanged)
   }
 
   destroy(): void {
@@ -115,9 +118,9 @@ export class MapObjectLayersController {
     }
   }
 
-  private applyBaseMapVariant(): void {
-    const theme = BASE_MAP_VARIANTS[this.baseMapVariant].overlayTheme
-    switchBaseMapVariant(this.map, this.baseMapVariant)
+  private applyBaseMapVariant(switchVariant: boolean): void {
+    const theme = getVisibleOverlayTheme(this.baseMapVariant, this.visibility)
+    if (switchVariant) switchBaseMapVariant(this.map, this.baseMapVariant)
     this.applyThemeImages(theme)
     this.domains.forEach(({ applyTheme }) => applyTheme(this.map, theme))
   }

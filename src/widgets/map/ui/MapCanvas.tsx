@@ -3,7 +3,7 @@ import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useTranslation } from 'react-i18next'
 import { registerBaseMapLayer } from '../../../entities/base-map/map/registerBaseMapLayer'
-import type { BaseMapVariantId } from '../../../shared/config/map'
+import type { BaseMapVariantId, LayerVisibility } from '../../../shared/config/map'
 import type { SupportedLanguage } from '../../../shared/config/i18n'
 import { MAP_OPTIONS } from '../../../shared/config/map'
 import { getStoredMapCamera, saveMapCamera } from '../model/cameraStorage'
@@ -19,14 +19,17 @@ type MapCanvasProps = {
   onSearchFeaturesReady: (provider: MapObjectFeaturesProvider | null) => void
   onObjectFeatureAtPointReady: (provider: MapObjectFeatureAtPointProvider | null) => void
   language: SupportedLanguage
+  layerVisibility: LayerVisibility
   baseMapVariant: BaseMapVariantId
 }
 
-export function MapCanvas({ onMapReady, onSearchFeaturesReady, onObjectFeatureAtPointReady, language, baseMapVariant }: MapCanvasProps) {
+export function MapCanvas({ onMapReady, onSearchFeaturesReady, onObjectFeatureAtPointReady, language, baseMapVariant, layerVisibility }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const objectLayersControllerRef = useRef<MapObjectLayersController | null>(null)
   const languageRef = useRef(language)
   const baseMapVariantRef = useRef(baseMapVariant)
+  const visibilityRef = useRef(layerVisibility)
+  visibilityRef.current = layerVisibility
   const { t } = useTranslation()
 
   languageRef.current = language
@@ -43,7 +46,7 @@ export function MapCanvas({ onMapReady, onSearchFeaturesReady, onObjectFeatureAt
 
     const onLoad = () => {
       registerBaseMapLayer(map)
-      const controller = new MapObjectLayersController(map, languageRef.current, baseMapVariantRef.current)
+      const controller = new MapObjectLayersController(map, languageRef.current, baseMapVariantRef.current, visibilityRef.current)
       controller.initialize()
       objectLayersControllerRef.current = controller
       onSearchFeaturesReady(() => controller.getSearchFeatures())
@@ -69,8 +72,8 @@ export function MapCanvas({ onMapReady, onSearchFeaturesReady, onObjectFeatureAt
   }, [language])
 
   useEffect(() => {
-    objectLayersControllerRef.current?.setBaseMapVariant(baseMapVariant)
-  }, [baseMapVariant])
+    objectLayersControllerRef.current?.setBaseMapVariant(baseMapVariant, layerVisibility)
+  }, [baseMapVariant, layerVisibility])
 
   return <div ref={containerRef} className="map-canvas" aria-label={t('interface.map.ariaLabel')} />
 }

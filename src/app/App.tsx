@@ -7,8 +7,6 @@ import {
   type BaseMapVariantId,
 } from '../shared/config/map'
 import { MOBILE_MEDIA_QUERY, type InspectorPlacement } from '../shared/config/layout'
-import { MapBasemapSwitcher } from '../features/map-basemap-switcher/ui/MapBasemapSwitcher'
-import { MapLanguageSwitcher } from '../features/map-language/ui/MapLanguageSwitcher'
 import { MapPointerInfo } from '../features/map-pointer/ui/MapPointerInfo'
 import { MapSearch } from '../features/map-search/ui/MapSearch'
 import type { SearchIntent } from '../features/map-search/ui/MapSearch'
@@ -31,6 +29,10 @@ import type {
   SearchMapObjectFeature,
 } from '../widgets/map/model/MapObjectLayersController'
 import { extendGeometryBounds } from '../features/map-search/model/geometryBounds'
+import { MapControls } from '../widgets/map-controls/ui/MapControls'
+import { MARKER_CATEGORIES } from '../features/map-markers/model/catalog'
+import { MapMarkers } from '../features/map-markers/ui/MapMarkers'
+import { useMapPreferences } from './model/mapPreferences'
 import './styles/global.css'
 
 export type SearchSession = {
@@ -134,6 +136,7 @@ export function App() {
   const [getSearchFeatures, setSearchFeaturesProvider] = useState<MapObjectFeaturesProvider | null>(null)
   const [getObjectFeatureAtPoint, setObjectFeatureAtPointProvider] = useState<MapObjectFeatureAtPointProvider | null>(null)
   const [baseMapVariant, setBaseMapVariant] = useState<BaseMapVariantId>(getInitialBaseMapVariant)
+  const [{ layerVisibility, markerVisibility, showAttributes, showZoom }, setPreferences] = useMapPreferences()
   const [inspector, setInspector] = useState<InspectorState>(null)
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.matchMedia(MOBILE_MEDIA_QUERY).matches)
   const [isInspectorVisible, setIsInspectorVisible] = useState(false)
@@ -249,6 +252,12 @@ export function App() {
     setInspector(openDirectObjectDetails(object))
   }, [])
 
+  const handleSelectMarker = useCallback((object: InspectableObject) => {
+    objectPickRunRef.current += 1
+    objectSelectionRunRef.current += 1
+    handleOpenDirectObject(object, [])
+  }, [handleOpenDirectObject])
+
   const handleBackToResults = useCallback(() => {
     const action = getInspectorBackAction(inspector)
     applyHighlightsRef.current?.(action.highlights)
@@ -352,6 +361,7 @@ export function App() {
         onObjectFeatureAtPointReady={handleObjectFeatureAtPointReady}
         language={language}
         baseMapVariant={baseMapVariant}
+        layerVisibility={layerVisibility[baseMapVariant]}
       />
       <MapSearch
         map={map}
@@ -364,6 +374,7 @@ export function App() {
       />
       <ObjectInspector
         view={inspectorView}
+        showAttributes={showAttributes}
         onSelect={handleSelectObject}
         onBack={handleBackToResults}
         onClose={handleCloseInspector}
@@ -371,10 +382,18 @@ export function App() {
         onSizeChange={handleInspectorSizeChange}
         onVisibilityChange={setIsInspectorVisible}
       />
-      <MapZoomIndicator map={map} />
-      <MapLanguageSwitcher />
+      {showZoom && <MapZoomIndicator map={map} />}
       {/* <MapPointerInfo map={map} /> */}
-      <MapBasemapSwitcher map={map} selectedVariant={baseMapVariant} onVariantChange={changeBaseMapVariant} />
+      <MapMarkers map={map} categories={MARKER_CATEGORIES} visibility={markerVisibility} language={language} onSelect={handleSelectMarker} />
+      <MapControls layers={{
+        map, variant: baseMapVariant, onVariantChange: changeBaseMapVariant,
+        visibility: layerVisibility[baseMapVariant],
+        onVisibilityChange: (id, visible) => setPreferences(current => ({ ...current, layerVisibility: { ...current.layerVisibility, [baseMapVariant]: { ...current.layerVisibility[baseMapVariant], [id]: visible } } })),
+        showAttributes, onShowAttributesChange: value => setPreferences(current => ({ ...current, showAttributes: value })),
+        showZoom, onShowZoomChange: value => setPreferences(current => ({ ...current, showZoom: value })),
+      }} markers={{ categories: MARKER_CATEGORIES, visibility: markerVisibility,
+        onChange: (id, visible) => setPreferences(current => ({ ...current, markerVisibility: { ...current.markerVisibility, [id]: visible } })),
+      }} />
     </main>
   )
 }

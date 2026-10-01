@@ -28,6 +28,7 @@ function toggleSheet(position: SheetPosition): SheetPosition {
 
 type ObjectInspectorProps = {
   view: ObjectInspectorView | null
+  showAttributes?: boolean
   onSelect: (object: InspectableObject) => void
   onBack: () => void
   onClose: () => void
@@ -55,7 +56,7 @@ function formatProperty(value: unknown): string {
   }
 }
 
-export function ObjectInspector({ view, onSelect, onBack, onClose, placement, onSizeChange, onVisibilityChange }: ObjectInspectorProps) {
+export function ObjectInspector({ showAttributes = true, view, onSelect, onBack, onClose, placement, onSizeChange, onVisibilityChange }: ObjectInspectorProps) {
   const { t } = useTranslation()
   const panelRef = useRef<HTMLElement>(null)
   const [displayedView, setDisplayedView] = useState(view)
@@ -181,8 +182,11 @@ export function ObjectInspector({ view, onSelect, onBack, onClose, placement, on
                   className="object-inspector__tile"
                   onClick={() => onSelect(object)}
                 >
-                  <span className="object-inspector__tile-title">{object.title}</span>
-                  {object.description && <span className="object-inspector__tile-description">{object.description}</span>}
+                  <span className="object-inspector__tile-icon" aria-hidden="true"><span className="map-search__pin" /></span>
+                  <span className="object-inspector__tile-text">
+                    <span className="object-inspector__tile-title">{object.title}</span>
+                    {object.description && <span className="object-inspector__tile-description">{object.description}</span>}
+                  </span>
                 </button>
               ))}
             </div>
@@ -205,21 +209,24 @@ export function ObjectInspector({ view, onSelect, onBack, onClose, placement, on
             <button type="button" className="object-inspector__back" onClick={onBack}>← {t('interface.inspector.back')}</button>
             <button type="button" className="object-inspector__icon-button" aria-label={t('interface.inspector.close')} onClick={onClose}>×</button>
           </header>
-          <div className="object-inspector__details">
-            <h2>{object.title}</h2>
-            {object.description && <p className="object-inspector__description">{object.description}</p>}
-            {url && <a className="object-inspector__fandom-link" href={url} target="_blank" rel="noreferrer noopener">{t('interface.inspector.fandomLink')}</a>}
+          <div className="object-inspector__body">
+            <div className="object-inspector__hero" aria-hidden="true"><span className="map-search__pin" /></div>
+            <div className="object-inspector__details">
+              <h2>{object.title}</h2>
+              {object.description && <p className="object-inspector__description">{object.description}</p>}
+              {url && <a className="object-inspector__fandom-link" href={url} target="_blank" rel="noreferrer noopener">{t('interface.inspector.fandomLink')}</a>}
+            </div>
+            {showAttributes && <section className="object-inspector__debug" aria-label={t('interface.inspector.geoJsonAttributes')}>
+              <h3>{t('interface.inspector.geoJsonAttributes')}</h3>
+              <dl>
+                <div><dt>{t('interface.inspector.sourceId')}</dt><dd>{object.sourceId}</dd></div>
+                <div><dt>{t('interface.inspector.featureId')}</dt><dd>{String(object.id)}</dd></div>
+                {Object.entries(properties).map(([key, value]) => (
+                  <div key={key}><dt>{key}</dt><dd>{formatProperty(value)}</dd></div>
+                ))}
+              </dl>
+            </section>}
           </div>
-          <section className="object-inspector__debug" aria-label={t('interface.inspector.geoJsonAttributes')}>
-            <h3>{t('interface.inspector.geoJsonAttributes')}</h3>
-            <dl>
-              <div><dt>{t('interface.inspector.sourceId')}</dt><dd>{object.sourceId}</dd></div>
-              <div><dt>{t('interface.inspector.featureId')}</dt><dd>{String(object.id)}</dd></div>
-              {Object.entries(properties).map(([key, value]) => (
-                <div key={key}><dt>{key}</dt><dd>{formatProperty(value)}</dd></div>
-              ))}
-            </dl>
-          </section>
         </>
       )}
     </aside>

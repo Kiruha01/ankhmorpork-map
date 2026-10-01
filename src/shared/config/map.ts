@@ -234,30 +234,94 @@ export function createOverlayTheme(patch: OverlayThemePatch = {}): OverlayTheme 
   }
 }
 
+export type LayerVisibilityOption = {
+  id: string
+  labelKey: string
+  defaultVisible: boolean
+  targets: { [D in Exclude<keyof OverlayTheme, 'images'>]: { domain: D; layers: (keyof OverlayTheme[D])[] } }[Exclude<keyof OverlayTheme, 'images'>][]
+}
+export type LayerVisibility = Record<string, boolean>
+export type BaseMapLayerVisibility = Record<BaseMapVariantId, LayerVisibility>
+
 type BaseMapVariant = {
+  visibilityOptions: LayerVisibilityOption[]
   previewUrl: string
   overlayTheme: OverlayTheme
 } & ({ type: 'raster'; tilesUrl: string } | { type: 'vector'; styleUrl: string })
 
 export const BASE_MAP_VARIANTS: Record<BaseMapVariantId, BaseMapVariant> = {
   orig: {
+    visibilityOptions: [
+      { id: 'orig-buildings', labelKey: 'interface.layers.buildings', defaultVisible: true, targets: [{ domain: 'buildings', layers: ['fill', 'outline', 'labels'] }] },
+      { id: 'orig-streets', labelKey: 'interface.layers.streets', defaultVisible: false, targets: [{ domain: 'streets', layers: ['yard', 'street', 'main', 'labels'] }] },
+      { id: 'orig-places', labelKey: 'interface.layers.places', defaultVisible: true, targets: [{ domain: 'parks', layers: ['labels'] }, { domain: 'squares', layers: ['labels'] }] },
+      { id: 'orig-beers', labelKey: 'interface.layers.beers', defaultVisible: true, targets: [{ domain: 'beers', layers: ['marker', 'labels'] }] },
+    ],
     type: 'raster',
     tilesUrl: 'https://tiles.klisov.ru/orig/{z}/{x}/{y}.jpg',
     previewUrl: `${import.meta.env.BASE_URL}assets/images/map_orig.jpg`,
     overlayTheme: createOverlayTheme(),
   },
   rus: {
+    visibilityOptions: [
+      { id: 'rus-labels', labelKey: 'interface.layers.labels', defaultVisible: false, targets: [{ domain: 'buildings', layers: ['labels'] }, { domain: 'streets', layers: ['labels'] }, { domain: 'parks', layers: ['labels'] }, { domain: 'squares', layers: ['labels'] }] },
+      { id: 'rus-streets', labelKey: 'interface.layers.streetLines', defaultVisible: false, targets: [{ domain: 'streets', layers: ['yard', 'street', 'main'] }] },
+      { id: 'rus-beers', labelKey: 'interface.layers.beers', defaultVisible: true, targets: [{ domain: 'beers', layers: ['marker', 'labels'] }] },
+    ],
     type: 'raster',
     tilesUrl: 'https://tiles.klisov.ru/rus/{z}/{x}/{y}.jpg',
     previewUrl: `${import.meta.env.BASE_URL}assets/images/map_rus.jpg`,
-    overlayTheme: createOverlayTheme(),
+    overlayTheme: createOverlayTheme({
+  buildings: {
+    fill: {
+      paint: {
+        'fill-color': '#00000000',
+      },
+    },
+    outline: {
+      paint: {
+        'line-color': '#00000000',
+      }
+    },
+  },
+}),
   },
   landscape: {
+    visibilityOptions: [
+      { id: 'landscape-buildings', labelKey: 'interface.layers.buildings', defaultVisible: true, targets: [{ domain: 'buildings', layers: ['fill', 'outline', 'labels'] }] },
+      { id: 'landscape-streets', labelKey: 'interface.layers.streets', defaultVisible: true, targets: [{ domain: 'streets', layers: ['yard', 'street', 'main', 'labels'] }] },
+      { id: 'landscape-streets-lines', labelKey: 'interface.layers.streetLines', defaultVisible: false, targets: [{ domain: 'streets', layers: ['yard', 'street', 'main'] }] },
+      { id: 'landscape-parks', labelKey: 'interface.layers.parks', defaultVisible: true, targets: [{ domain: 'parks', layers: ['labels'] }] },
+      { id: 'landscape-squares', labelKey: 'interface.layers.squares', defaultVisible: true, targets: [{ domain: 'squares', layers: ['labels'] }] },
+      { id: 'landscape-beers', labelKey: 'interface.layers.beers', defaultVisible: true, targets: [{ domain: 'beers', layers: ['marker', 'labels'] }] },
+    ],
     type: 'vector',
     styleUrl: `${import.meta.env.BASE_URL}geojsons/landscape/style.json`,
     previewUrl: `${import.meta.env.BASE_URL}assets/images/map_landscape.svg`,
     overlayTheme: createOverlayTheme(),
   },
+}
+
+export function createInitialLayerVisibility(): BaseMapLayerVisibility {
+  return Object.fromEntries(Object.entries(BASE_MAP_VARIANTS).map(([id, variant]) => [
+    id, Object.fromEntries(variant.visibilityOptions.map(option => [option.id, option.defaultVisible])),
+  ])) as BaseMapLayerVisibility
+}
+
+/** Visibility is applied to a fresh theme; the configured MapLibre styling stays intact. */
+export function getVisibleOverlayTheme(variant: BaseMapVariantId, visibility: LayerVisibility): OverlayTheme {
+  const config = BASE_MAP_VARIANTS[variant]
+  const theme = createOverlayTheme(config.overlayTheme)
+  for (const option of config.visibilityOptions) {
+    if (visibility[option.id] ?? option.defaultVisible) continue
+    for (const target of option.targets) {
+      const layers = theme[target.domain] as Record<string, { layout?: { visibility?: 'none' | 'visible' } }>
+      for (const key of target.layers) {
+        layers[key].layout = { ...layers[key].layout, visibility: 'none' }
+      }
+    }
+  }
+  return theme
 }
 
 export function getInitialBaseMapVariant(): BaseMapVariantId {
