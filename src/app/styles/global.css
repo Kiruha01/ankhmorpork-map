@@ -13,11 +13,14 @@ body {
 }
 
 .app {
-  --inspector-width: 27rem;
-  min-height: 100vh;
+  --inspector-width: 410px;
+  height: 100dvh;
+  overflow: hidden;
   position: relative;
 }
 
 .app--mobile {
   --mobile-edge: max(.75rem, env(safe-area-inset-left));
 }
+
+button, input { font-family: inherit; }

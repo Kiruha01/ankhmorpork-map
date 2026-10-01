@@ -543,6 +543,34 @@
     }
   },
   "interface": {
+    "layers": {
+      "button": "Layers",
+      "title": "Map settings",
+      "mapType": "Map type",
+      "options": "Map overlays",
+      "display": "Display",
+      "showZoom": "Show zoom value",
+      "buildings": "Buildings",
+      "streets": "Streets",
+      "places": "Parks and squares",
+      "beers": "Pubs",
+      "labels": "Object labels",
+      "buildingShapes": "Building shapes",
+      "streetLines": "Street lines",
+      "parks": "Park labels",
+      "squares": "Square labels"
+    },
+    "markers": {
+      "button": "Markers",
+      "title": "Map markers",
+      "landmarks": "Landmarks",
+      "landmarksDescription": "Places to explore",
+      "meeting": "Meeting places",
+      "meetingDescription": "Places to meet friends",
+      "landmarkTitle": "Demo landmark",
+      "meetingTitle": "Demo meeting place",
+      "mockDescription": "A demonstration marker. The marker catalog will be expanded later."
+    },
     "siteTitle": "Ankh-Morpork Map",
     "map": {
       "ariaLabel": "Map with GeoJSON objects"

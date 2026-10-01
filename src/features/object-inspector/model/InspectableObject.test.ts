@@ -23,8 +23,8 @@ describe('createInspectableObject', () => {
     expect(object.title).toBe('Гильдия убийц')
   })
 
-  it('falls back field-by-field to English and then to name_id', () => {
-    expect(createInspectableObject(rawFeature({ name_id: 'street_attic_bee' }), 'ru').title).toBe('Attic bee street')
+  it('falls back to English for an unavailable locale and then to name_id', () => {
+    expect(createInspectableObject(rawFeature({ name_id: 'street_attic_bee' }), 'missing-locale').title).toBe('Attic bee street')
     expect(createInspectableObject(rawFeature({ name_id: 'not-translated' }), 'ru').title).toBe('not-translated')
   })
 

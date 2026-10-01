@@ -1,4 +1,4 @@
-import { getObjectItemTranslation, getUntitledObjectTitle, type SupportedLanguage } from '../../../shared/config/i18n'
+import { i18n, getObjectItemTranslation, getUntitledObjectTitle, type SupportedLanguage } from '../../../shared/config/i18n'
 import type { MapObjectFeature } from '../../../shared/lib/geojson/types'
 import type { SearchMapObjectFeature } from '../../../widgets/map/model/MapObjectLayersController'
 
@@ -21,6 +21,13 @@ export function createInspectableObject(
   { sourceId, id, feature }: SearchMapObjectFeature,
   language: SupportedLanguage,
 ): InspectableObject {
+  if (sourceId === 'local-markers' && typeof feature.properties?.markerTitleKey === 'string') {
+    return { sourceId, id, feature,
+      title: i18n.t(feature.properties.markerTitleKey, { lng: language }),
+      description: i18n.t(String(feature.properties.markerDescriptionKey), { lng: language }),
+      fandomWiki: String(feature.properties.wikiUrl ?? ''),
+    }
+  }
   const nameId = getNameId(feature)
   const translation = nameId ? getObjectItemTranslation(language, nameId) : null
 
