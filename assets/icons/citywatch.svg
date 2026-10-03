@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" fill="#795238">
+  <title>Коричневые скрещённые алебарды на прозрачном фоне</title>
+  <defs>
+    <g id="halberd" stroke="#795238" stroke-width="6" stroke-linejoin="round">
+      <path d="M-5-73H5V101L0 109L-5 101Z"/>
+      <path d="M0-116L11-88L5-74H-5L-11-88Z"/>
+      <path d="M4-76C20-77 30-85 40-96C35-75 38-53 48-34C30-43 18-43 4-37Z"/>
+      <path d="M-4-72L-34-49L-4-54Z"/>
+      <path d="M-9-39H9V-30H-9Z M-8 89H8V97H-8Z"/>
+    </g>
+  </defs>
+  <g transform="translate(128 128) scale(1.3796810623) translate(-128 -125.2069979830)">
+    <use href="#halberd" transform="translate(128 128) rotate(-37.0604066013) scale(-1 1)"/>
+    <use href="#halberd" transform="translate(128 128) rotate(37.0604066013)"/>
+  </g>
+</svg>
