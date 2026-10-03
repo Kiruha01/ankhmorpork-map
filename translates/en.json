@@ -550,6 +550,7 @@
       "options": "Map overlays",
       "display": "Display",
       "showZoom": "Show zoom value",
+      "showNavigation": "Show map controls",
       "buildings": "Buildings",
       "streets": "Streets",
       "places": "Parks and squares",

@@ -9,7 +9,8 @@ function defaults() {
     layerVisibility: createInitialLayerVisibility(),
     markerVisibility: Object.fromEntries(MARKER_CATEGORIES.map(category => [category.id, category.defaultVisible])),
     showAttributes: true,
-    showZoom: true,
+    showZoom: false,
+    showNavigation: false,
   }
 }
 type Preferences = ReturnType<typeof defaults>

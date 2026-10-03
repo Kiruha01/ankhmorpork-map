@@ -13,6 +13,8 @@ type Props = {
   onShowAttributesChange: (value: boolean) => void
   showZoom: boolean
   onShowZoomChange: (value: boolean) => void
+  showNavigation: boolean
+  onShowNavigationChange: (value: boolean) => void
 }
 export function MapLayers(props: Props) {
   const { t } = useTranslation()
@@ -32,6 +34,9 @@ export function MapLayers(props: Props) {
     </label>
     <label className="map-controls__switch"><span>{t('interface.layers.showZoom')}</span>
       <input type="checkbox" checked={props.showZoom} onChange={event => props.onShowZoomChange(event.target.checked)} />
+    </label>
+    <label className="map-controls__switch"><span>{t('interface.layers.showNavigation')}</span>
+      <input type="checkbox" checked={props.showNavigation} onChange={event => props.onShowNavigationChange(event.target.checked)} />
     </label>
   </>
 }

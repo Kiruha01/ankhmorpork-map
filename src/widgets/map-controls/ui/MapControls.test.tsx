@@ -24,6 +24,7 @@ function Harness() {
   return <MapControls layers={{ map: {} as maplibregl.Map, variant, onVariantChange: setVariant, visibility: visibility[variant],
     onVisibilityChange: (id, value) => setVisibility(current => ({ ...current, [variant]: { ...current[variant], [id]: value } })),
     showAttributes: true, onShowAttributesChange: vi.fn(), showZoom, onShowZoomChange: setShowZoom,
+    showNavigation: true, onShowNavigationChange: vi.fn(),
   }} markers={{ categories: MARKER_CATEGORIES, visibility: markers, onChange: (id, value) => {
     changed(id, value); setMarkers(current => ({ ...current, [id]: value }))
   } }} />

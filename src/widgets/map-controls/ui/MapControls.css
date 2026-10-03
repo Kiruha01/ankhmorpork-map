@@ -10,7 +10,7 @@
 .map-controls__trigger[aria-expanded="true"] .map-controls__circle { background: #eaf2ff; }
 .map-controls__trigger:focus-visible { outline: none; }
 .map-controls__trigger:focus-visible .map-controls__circle { outline: 3px solid #79adff; outline-offset: 3px; }
-.map-controls__layers-icon { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.map-controls__layers-icon { width: 24px; height: 24px; background-color: currentColor; mask: url('/assets/icons/layers.svg') center / contain no-repeat; }
 .map-controls__panel { position: absolute; top: 0; right: 90px; width: min(350px, calc(100vw - 128px)); max-height: calc(100dvh - 40px - env(safe-area-inset-top)); overflow-y: auto; overscroll-behavior: contain; padding: 18px; border-radius: 20px; background: white; box-shadow: 0 8px 32px #26323838; color: #202124; }
 .map-controls__panel--markers { top: 84px; max-height: calc(100dvh - 124px - env(safe-area-inset-top)); border-radius: 24px; padding: 20px; }
 .map-controls__panel--language { width: min(270px, calc(100vw - 128px)); padding: 7px; }

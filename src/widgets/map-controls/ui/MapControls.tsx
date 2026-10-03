@@ -37,7 +37,7 @@ export function MapControls({ layers, markers }: Props) {
         onClick={event => { trigger.current = event.currentTarget; setMenu(current => current === name ? null : name) }}>
         <span className="map-controls__circle" aria-hidden="true">
           {name === 'language' ? <span className="map-controls__flag">{language?.flag}</span>
-            : name === 'markers' ? <span className="map-search__pin" /> : <svg className="map-controls__layers-icon" viewBox="0 0 24 24"><path d="m12 3 10 6-10 6L2 9l10-6Z M3 13l9 5 9-5 M3 17l9 5 9-5" /></svg>}
+            : name === 'markers' ? <span className="map-search__pin" /> : <span className="map-controls__layers-icon" />}
         </span>
         <span className="map-controls__caption">{name === 'language' ? language?.code.toUpperCase() : t(`interface.${name}.button`)}</span>
       </button>)}

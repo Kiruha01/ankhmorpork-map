@@ -136,7 +136,7 @@ export function App() {
   const [getSearchFeatures, setSearchFeaturesProvider] = useState<MapObjectFeaturesProvider | null>(null)
   const [getObjectFeatureAtPoint, setObjectFeatureAtPointProvider] = useState<MapObjectFeatureAtPointProvider | null>(null)
   const [baseMapVariant, setBaseMapVariant] = useState<BaseMapVariantId>(getInitialBaseMapVariant)
-  const [{ layerVisibility, markerVisibility, showAttributes, showZoom }, setPreferences] = useMapPreferences()
+  const [{ layerVisibility, markerVisibility, showAttributes, showZoom, showNavigation }, setPreferences] = useMapPreferences()
   const [inspector, setInspector] = useState<InspectorState>(null)
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.matchMedia(MOBILE_MEDIA_QUERY).matches)
   const [isInspectorVisible, setIsInspectorVisible] = useState(false)
@@ -362,6 +362,7 @@ export function App() {
         language={language}
         baseMapVariant={baseMapVariant}
         layerVisibility={layerVisibility[baseMapVariant]}
+        showNavigation={showNavigation}
       />
       <MapSearch
         map={map}
@@ -391,6 +392,7 @@ export function App() {
         onVisibilityChange: (id, visible) => setPreferences(current => ({ ...current, layerVisibility: { ...current.layerVisibility, [baseMapVariant]: { ...current.layerVisibility[baseMapVariant], [id]: visible } } })),
         showAttributes, onShowAttributesChange: value => setPreferences(current => ({ ...current, showAttributes: value })),
         showZoom, onShowZoomChange: value => setPreferences(current => ({ ...current, showZoom: value })),
+        showNavigation, onShowNavigationChange: value => setPreferences(current => ({ ...current, showNavigation: value })),
       }} markers={{ categories: MARKER_CATEGORIES, visibility: markerVisibility,
         onChange: (id, visible) => setPreferences(current => ({ ...current, markerVisibility: { ...current.markerVisibility, [id]: visible } })),
       }} />

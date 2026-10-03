@@ -21,9 +21,10 @@ type MapCanvasProps = {
   language: SupportedLanguage
   layerVisibility: LayerVisibility
   baseMapVariant: BaseMapVariantId
+  showNavigation: boolean
 }
 
-export function MapCanvas({ onMapReady, onSearchFeaturesReady, onObjectFeatureAtPointReady, language, baseMapVariant, layerVisibility }: MapCanvasProps) {
+export function MapCanvas({ onMapReady, onSearchFeaturesReady, onObjectFeatureAtPointReady, language, baseMapVariant, layerVisibility, showNavigation }: MapCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const objectLayersControllerRef = useRef<MapObjectLayersController | null>(null)
   const languageRef = useRef(language)
@@ -75,5 +76,5 @@ export function MapCanvas({ onMapReady, onSearchFeaturesReady, onObjectFeatureAt
     objectLayersControllerRef.current?.setBaseMapVariant(baseMapVariant, layerVisibility)
   }, [baseMapVariant, layerVisibility])
 
-  return <div ref={containerRef} className="map-canvas" aria-label={t('interface.map.ariaLabel')} />
+  return <div ref={containerRef} className={`map-canvas${showNavigation ? '' : ' map-canvas--navigation-hidden'}`} aria-label={t('interface.map.ariaLabel')} />
 }
