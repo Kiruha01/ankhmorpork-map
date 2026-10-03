@@ -6,6 +6,7 @@ import { getVisibleOverlayTheme, type LayerVisibility, type BaseMapVariantId, ty
 import { LocalizedGeoJsonDataset } from '../../../shared/lib/geojson/localizedSource'
 import type { MapObjectFeature } from '../../../shared/lib/geojson/types'
 import type { SupportedLanguage } from '../../../shared/config/i18n'
+import { loadMapImage } from '../../../shared/lib/map/loadMapImage'
 
 type LoadedObjectDomain = MapObjectDomain & {
   dataset: LocalizedGeoJsonDataset
@@ -129,8 +130,8 @@ export class MapObjectLayersController {
     Object.entries(theme.images ?? {}).forEach(([name, image]) => {
       if (this.map.hasImage(name)) return
 
-      void this.map.loadImage(image.url)
-        .then(({ data }) => {
+      void loadMapImage(this.map, image.url, image.rasterSize, image.halo)
+        .then((data) => {
           if (!this.destroyed && !this.map.hasImage(name)) this.map.addImage(name, data, image.options)
         })
         .catch((error: unknown) => {

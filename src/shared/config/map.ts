@@ -1,5 +1,5 @@
 import type {
-  CircleLayerSpecification,
+  ExpressionSpecification,
   FillLayerSpecification,
   LineLayerSpecification,
   StyleImageMetadata,
@@ -11,12 +11,32 @@ export type BaseMapVariantId = 'orig' | 'rus' | 'landscape'
 
 export const BASE_MAP_VARIANT_STORAGE_KEY = 'map-basemap-variant'
 
+const ICON_ZOOM_OPACITY: ExpressionSpecification = ['interpolate', ['linear'], ['zoom'], 16, 0, 16.1, 1]
+
+type MapThemeImage = {
+  url: string
+  /** SVG raster dimensions in physical pixels, before applying pixelRatio. */
+  rasterSize?: { width: number; height: number }
+  /** Outline width in raster pixels. */
+  halo?: { color: string; width: number }
+  options?: Partial<StyleImageMetadata>
+}
+
+/** Shared defaults for square SVG icons; size is measured in raster pixels. */
+function createMapIcon(fileName: string, size = 32): MapThemeImage {
+  return {
+    url: `${import.meta.env.BASE_URL}assets/icons/${fileName}`,
+    rasterSize: { width: size, height: size },
+    options: { pixelRatio: 2 },
+  }
+}
+
 export type OverlayTheme = {
   /**
    * Named raster/SVG images usable from symbol `icon-image` expressions.
    * Image names are global to the MapLibre map, so use a stable, unique name.
    */
-  images?: Record<string, { url: string; options?: Partial<StyleImageMetadata> }>
+  images?: Record<string, MapThemeImage>
   buildings: {
     fill: LayerTheme<FillLayerSpecification>
     outline: LayerTheme<LineLayerSpecification>
@@ -29,7 +49,7 @@ export type OverlayTheme = {
     labels: LayerTheme<SymbolLayerSpecification>
   }
   beers: {
-    marker: LayerTheme<CircleLayerSpecification>
+    marker: LayerTheme<SymbolLayerSpecification>
     labels: LayerTheme<SymbolLayerSpecification>
   }
   parks: {
@@ -78,6 +98,13 @@ export type OverlayThemePatch = {
  * `layout['icon-image']` to its name or a MapLibre `case`/`match` expression.
  */
 const DEFAULT_OVERLAY_THEME: OverlayTheme = {
+  images: {
+    'building-guild': createMapIcon('guild.svg'),
+    'building-temple': createMapIcon('temple.svg'),
+    'building-university': createMapIcon('university.svg'),
+    'building-citywatch': createMapIcon('citywatch.svg'),
+    'beer-marker': createMapIcon('beer.svg', 64),
+  },
   buildings: {
     fill: {
       paint: {
@@ -90,15 +117,29 @@ const DEFAULT_OVERLAY_THEME: OverlayTheme = {
       },
     },
     labels: {
-      minzoom: 15,
+      minzoom: 14,
       layout: {
         'text-field': ['coalesce', ['get', 'label'], ''],
         'text-font': ['Open Sans Regular'],
         'text-size': ['interpolate', ['linear'], ['zoom'], 16, 13, 19, 18],
         'text-max-width': 10,
         'text-allow-overlap': false,
+        'icon-image': ['case', 
+          ['==', ['get', 'build_type'], 'guild'], 'building-guild', 
+          ['==', ['get', 'build_type'], 'temple'], 'building-temple', 
+          ['==', ['get', 'build_type'], 'university'], 'building-university', 
+          ['==', ['get', 'build_type'], 'citywatch'], 'building-citywatch', 
+
+          ''
+        ],
+        "text-offset": [0, 0.6],
+        "text-anchor": "top",
       },
-      paint: { 'text-color': '#201914', 'text-halo-color': '#feffe4', 'text-halo-width': 1.2 },
+      paint: {
+        'text-color': '#201914',
+        'text-halo-color': '#feffe4',
+        'text-halo-width': 1.2,
+      },
     },
   },
   streets: {
@@ -140,12 +181,13 @@ const DEFAULT_OVERLAY_THEME: OverlayTheme = {
   beers: {
     marker: {
       minzoom: 15,
-      paint: {
-        'circle-color': '#c77622',
-        'circle-stroke-color': '#fff6d3',
-        'circle-stroke-width': ['interpolate', ['linear'], ['zoom'], 15, 1, 19, 2],
-        'circle-radius': ['interpolate', ['linear'], ['zoom'], 15, 3, 18, 6],
+      layout: {
+        'icon-image': 'beer-marker',
+        'icon-size': 0.8,
+        'icon-allow-overlap': true,
+        'icon-ignore-placement': true,
       },
+      paint: { 'icon-opacity': ICON_ZOOM_OPACITY },
     },
     labels: {
       minzoom: 17,
@@ -187,7 +229,7 @@ const DEFAULT_OVERLAY_THEME: OverlayTheme = {
   },
 }
 
-function mergeLayerTheme<T extends FillLayerSpecification | LineLayerSpecification | CircleLayerSpecification | SymbolLayerSpecification>(
+function mergeLayerTheme<T extends FillLayerSpecification | LineLayerSpecification | SymbolLayerSpecification>(
   base: LayerTheme<T>,
   patch: LayerTheme<T> | undefined,
 ): LayerTheme<T> {
@@ -206,7 +248,7 @@ export function createOverlayTheme(patch: OverlayThemePatch = {}): OverlayTheme 
   const { buildings, streets, beers, parks, squares } = DEFAULT_OVERLAY_THEME
 
   return {
-    images: patch.images,
+    images: { ...DEFAULT_OVERLAY_THEME.images, ...patch.images },
     buildings: {
       fill: mergeLayerTheme(buildings.fill, patch.buildings?.fill),
       outline: mergeLayerTheme(buildings.outline, patch.buildings?.outline),

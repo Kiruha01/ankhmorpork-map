@@ -1,10 +1,10 @@
 import type maplibregl from 'maplibre-gl'
-import type { CircleLayerSpecification, SymbolLayerSpecification } from 'maplibre-gl'
+import type { SymbolLayerSpecification } from 'maplibre-gl'
 import type { OverlayTheme } from '../../../shared/config/map'
 import { applyLayerTheme } from '../../../shared/lib/map/layerTheme'
 import { BEERS_SOURCE_ID } from './source'
 
-export const BEERS_CIRCLE_LAYER_ID = 'beers-points'
+export const BEERS_MARKER_LAYER_ID = 'beers-points'
 export const BEERS_LABEL_LAYER_ID = 'beers-labels'
 export const BEERS_SEARCH_RESULT_LAYER_ID = 'beers-search-results'
 const EMPTY_SEARCH_FEATURE_ID = '__map-search-no-results__'
@@ -17,11 +17,11 @@ function getSearchResultFilter(featureIds: readonly (string | number)[]): maplib
   return ['all', ['==', '$type', 'Point'], featureFilter] as unknown as maplibregl.FilterSpecification
 }
 
-export function getBeerLayers(theme: OverlayTheme): [CircleLayerSpecification, SymbolLayerSpecification] {
+export function getBeerLayers(theme: OverlayTheme): [SymbolLayerSpecification, SymbolLayerSpecification] {
   return [
     applyLayerTheme({
-      id: BEERS_CIRCLE_LAYER_ID,
-      type: 'circle',
+      id: BEERS_MARKER_LAYER_ID,
+      type: 'symbol',
       source: BEERS_SOURCE_ID,
       filter: ['==', '$type', 'Point'],
     }, theme.beers.marker),
