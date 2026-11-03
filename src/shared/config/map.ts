@@ -297,7 +297,7 @@ export const BASE_MAP_VARIANTS: Record<BaseMapVariantId, BaseMapVariant> = {
       { id: 'orig-beers', labelKey: 'interface.layers.beers', defaultVisible: true, targets: [{ domain: 'beers', layers: ['marker', 'labels'] }] },
     ],
     type: 'raster',
-    tilesUrl: 'https://tiles.klisov.ru/orig/{z}/{x}/{y}.jpg',
+    tilesUrl: 'https://all-tiles.klisov.ru/orig/{z}/{x}/{y}.jpg',
     previewUrl: `${import.meta.env.BASE_URL}assets/images/map_orig.jpg`,
     overlayTheme: createOverlayTheme(),
   },
@@ -308,7 +308,7 @@ export const BASE_MAP_VARIANTS: Record<BaseMapVariantId, BaseMapVariant> = {
       { id: 'rus-beers', labelKey: 'interface.layers.beers', defaultVisible: true, targets: [{ domain: 'beers', layers: ['marker', 'labels'] }] },
     ],
     type: 'raster',
-    tilesUrl: 'https://tiles.klisov.ru/rus/{z}/{x}/{y}.jpg',
+    tilesUrl: 'https://all-tiles.klisov.ru/rus/{z}/{x}/{y}.jpg',
     previewUrl: `${import.meta.env.BASE_URL}assets/images/map_rus.jpg`,
     overlayTheme: createOverlayTheme({
       buildings: {
