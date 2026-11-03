@@ -1,32 +1,37 @@
-# React + TypeScript + MapLibre GL JS
+# Ankh-Morpork Map
 
-## Запуск
+[Читать на русском](README.ru.md)
 
-```bash
+An interactive map of Ankh-Morpork, the city from Terry Pratchett’s Discworld. Explore its streets, find familiar landmarks, and discover places through searchable names and descriptions.
+
+**[Explore the map](https://kiruha01.github.io/ankhmorpork-map/)**
+
+## Explore the city
+
+- **Find a place.** Search by name, alternative spelling, or description. Choose a result to move to it on the map and highlight its location.
+- **Look closer.** Select a map object to view its name, description, and Fandom wiki link where available.
+- **Choose your map.** Switch between the original raster map, the Russian raster map, and the vector landscape view.
+- **Adjust the detail.** Choose which overlays to display, including building labels, streets, parks, squares, and beer locations. Available controls depend on the selected basemap.
+- **Switch languages.** Use the English or Russian interface and explore localized place names. Translations and descriptions are still being expanded.
+- **Browse on desktop or mobile.** Object details appear beside the map on desktop and in a resizable bottom panel on smaller screens. Your map preferences are saved between visits.
+
+## Help improve the map
+
+The map grows through contributions: a corrected building outline, a missing street, a better description, or a translation can all make it more useful.
+
+See the **[contribution guide](CONTRIBUTING.md)** for step-by-step instructions on editing map data in QGIS, naming objects, and updating translations. You do not need to change application code to contribute map data or text.
+
+Found something wrong or have an idea? [Open an issue](https://github.com/Kiruha01/ankhmorpork-map/issues) and describe the place or improvement. Screenshots and references help explain the change.
+
+## Run it locally
+
+With Node.js and npm installed, run these commands from a local copy of the repository:
+
+```sh
+npm install
 npm run dev
 ```
 
-Сборка для production: `npm run build`.
+Open the local address printed by Vite in your terminal.
 
-## Деплой в GitHub Pages
-
-Workflow [deploy-pages.yml](.github/workflows/deploy-pages.yml) запускается при каждом push в `master` и вручную из вкладки **Actions**. Он публикует собранное приложение в корень ветки `gh-pages`, сохраняя каталог `pr-preview`.
-
-Workflow [pr-preview.yml](.github/workflows/pr-preview.yml) собирает отдельную версию для каждого PR, включая PR из форков, с токеном только для чтения. [publish-pr-preview.yml](.github/workflows/publish-pr-preview.yml) получает artifact успешной сборки, сверяет его с актуальной веткой PR и публикует по адресу `https://kiruha01.github.io/ankhmorpork-map/pr-preview/pr-<номер>/`. [close-pr-preview.yml](.github/workflows/close-pr-preview.yml) фиксирует закрытие PR с токеном только для чтения, а [remove-pr-preview.yml](.github/workflows/remove-pr-preview.yml) проверяет его artifact и удаляет превью. Ссылка появляется и обновляется в комментарии к PR. Для PR из форков GitHub может потребовать одобрения запуска workflow по правилам репозитория.
-
-Для публикации настройте **Settings → Pages → Build and deployment → Source → Deploy from a branch**, выберите ветку `gh-pages` и каталог `/ (root)`. Если ветки ещё нет, сначала запустите workflow основного деплоя из **Actions**, затем выберите её в настройках Pages. В **Settings → Actions → General → Workflow permissions** включите **Read and write permissions**. Workflow публикации по `workflow_run` начнёт срабатывать после появления его файла в основной ветке репозитория.
-
-## Устройство
-
-Структура и правила её развития описаны в [AGENTS.md](AGENTS.md). MapLibre создаётся в `widgets/map`, доменные источники и стили лежат в `entities`, а React-интерфейс вокруг карты — в `features`.
-
-Конфигурация CORS для сервера с тайлами и GeoJSON находится в [infra/nginx/cors.conf](infra/nginx/cors.conf).
-
-## Как добавлять React-фичи, управляющие картой
-
-`App` хранит единственный экземпляр `maplibregl.Map`, который предоставляет `MapCanvas`. Новая UI-фича принимает его через props (при росте приложения можно заменить это на `MapContext`) и применяет изменение в `useEffect`.
-
-- Поиск: в `features/map-search` после события `sourcedata` индексируйте `map.querySourceFeatures(BUILDINGS_SOURCE_ID)` по полям `name`/`name_ru`. При выборе результата вызовите `map.fitBounds(...)`, а выделение задайте через `map.setFeatureState`. Для устойчивого выделения GeoJSON должен иметь `Feature.id` или свойство, указанное в `promoteId` у источника.
-- Язык: в `features/map-language` храните locale в React state. Для подписей добавьте символьный слой и обновляйте его `text-field` через `map.setLayoutProperty`, выбирая, например, `name_ru` или `name_en`.
-- Переключатель слоёв: в `features/map-layers` храните видимость каждого слоя и применяйте `map.setLayoutProperty(layerId, 'visibility', 'none' | 'visible')`. Конфигурация доступных слоёв должна оставаться у соответствующих доменов.
-- Карточка объекта: `features/object-inspector` подписывается на `map.on('click', layerId, ...)`, сохраняет выбранные свойства в React state и рендерит выезжающую панель. При закрытии очищайте `feature-state` выделения.
+The application uses React, TypeScript, and MapLibre GL JS. See **[Development](DEVELOPMENT.md)** for build commands, project structure, and guidance on extending the application.
